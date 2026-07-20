@@ -2,11 +2,11 @@
 
 import { load as loadCashfree } from "@cashfreepayments/cashfree-js";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { approveDevice, createCheckout } from "@/lib/apiClient";
 import { cashfreeMode, isFirebaseConfigured, TOPUP_PACKAGES_USD } from "@/lib/config";
-import { beginGoogleSignIn, consumeRedirectResult } from "@/lib/firebaseClient";
+import { beginGoogleSignIn, checkRedirectError, watchAuthState } from "@/lib/firebaseClient";
 
 type DeviceStatus = "idle" | "approving" | "approved" | "error";
 type CheckoutStatus = "idle" | "creating" | "error";
@@ -23,26 +23,33 @@ export function ActivateClient() {
   const [phone, setPhone] = useState("");
   const [checkoutStatus, setCheckoutStatus] = useState<CheckoutStatus>("idle");
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const autoApproveAttempted = useRef(false);
 
-  // Runs on every load, including the return trip from beginGoogleSignIn()'s
-  // full-page redirect -- Firebase preserves the current URL (so ?user_code=
-  // survives the round trip) and getRedirectResult() resolves null on a
-  // normal, non-redirect visit, so this is always safe to call.
+  // watchAuthState is the reliable signal -- it reads Firebase's own
+  // persisted auth state rather than trying to correlate a redirect result
+  // across this app's origin and Firebase's separate authDomain, which can
+  // silently resolve to nothing with no error (confirmed happening live on
+  // this deployment). checkRedirectError runs alongside it purely to
+  // surface a *real* failure (e.g. the OAuth exchange itself erroring).
   useEffect(() => {
     if (!isFirebaseConfigured) return;
-    consumeRedirectResult()
-      .then((result) => {
-        if (!result) return;
-        setSession(result);
-        if (userCode.trim()) {
-          void approve(result.idToken);
-        }
-      })
-      .catch((err) => {
-        setSignInError(err instanceof Error ? err.message : "Sign-in failed");
-      })
-      .finally(() => setCheckingRedirect(false));
-    // Deliberately run once on mount to consume a pending redirect result.
+
+    checkRedirectError().catch((err) => {
+      setSignInError(err instanceof Error ? err.message : "Sign-in failed");
+    });
+
+    const unsubscribe = watchAuthState((result) => {
+      setCheckingRedirect(false);
+      setSession(result);
+      if (result && userCode.trim() && !autoApproveAttempted.current) {
+        autoApproveAttempted.current = true;
+        void approve(result.idToken);
+      }
+    });
+
+    return unsubscribe;
+    // Deliberately run once on mount; userCode is read fresh inside the
+    // callback via closure and doesn't change after sign-in starts.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

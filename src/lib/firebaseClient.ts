@@ -5,6 +5,7 @@ import {
   GoogleAuthProvider,
   getAuth,
   getRedirectResult,
+  onAuthStateChanged,
   signInWithRedirect,
 } from "firebase/auth";
 
@@ -49,12 +50,33 @@ async function toSession(user: User): Promise<{ email: string; idToken: string }
 }
 
 /**
- * Call once on every page load. Resolves to the signed-in session if this
- * load is the return trip from `beginGoogleSignIn()`, or `null` on a
- * normal (non-redirect) page load -- safe to call unconditionally.
+ * Call once on every page load, purely to surface a *real* sign-in error
+ * (e.g. the OAuth exchange itself failing). Do not rely on its resolved
+ * value to detect success -- `getRedirectResult()` depends on correlating
+ * state across two different origins (this app's domain and Firebase's
+ * separate `*.firebaseapp.com` authDomain), which silently resolves to
+ * `null` instead of throwing when that correlation breaks (storage
+ * partitioning, tracking prevention, etc.) -- confirmed happening live on
+ * this deployment. `watchAuthState` below is the reliable signal.
  */
-export async function consumeRedirectResult(): Promise<{ email: string; idToken: string } | null> {
-  const result = await getRedirectResult(getFirebaseAuth());
-  if (!result) return null;
-  return toSession(result.user);
+export async function checkRedirectError(): Promise<void> {
+  await getRedirectResult(getFirebaseAuth());
+}
+
+/**
+ * The reliable way to detect a completed sign-in: Firebase's own
+ * persisted auth state, independent of the redirect-result correlation
+ * above. Fires immediately with the current state, then again on any
+ * change. Returns an unsubscribe function.
+ */
+export function watchAuthState(
+  callback: (session: { email: string; idToken: string } | null) => void,
+): () => void {
+  return onAuthStateChanged(getFirebaseAuth(), (user) => {
+    if (!user) {
+      callback(null);
+      return;
+    }
+    void toSession(user).then(callback);
+  });
 }
