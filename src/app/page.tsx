@@ -22,7 +22,8 @@ export default function Home() {
   return (
     <div className="mx-auto max-w-5xl px-6 py-16 sm:py-24">
       <section className="max-w-2xl">
-        <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
+        <p className="text-sm font-semibold uppercase tracking-wide text-cyan-500">HiveMind</p>
+        <h1 className="mt-2 text-4xl font-semibold tracking-tight sm:text-5xl">
           A fast, cost-optimized coding agent, running on DeepSeek.
         </h1>
         <p className="mt-6 text-lg opacity-80">
@@ -60,6 +61,20 @@ export default function Home() {
       </section>
 
       <section className="mt-20 rounded-lg border border-black/10 p-6 dark:border-white/10">
+        <h2 className="font-semibold">Why we ask for your Google account</h2>
+        <p className="mt-2 text-sm opacity-70">
+          Signing in with Google gives HiveMind your email address, which we use only to identify
+          your account and track your prepaid balance -- nothing else. We don&apos;t post on your
+          behalf, read your other Google data, or share your email with anyone besides our payment
+          processor (Cashfree) for billing records. Full details in our{" "}
+          <Link href="/privacy" className="underline">
+            Privacy Policy
+          </Link>
+          .
+        </p>
+      </section>
+
+      <section className="mt-6 rounded-lg border border-black/10 p-6 dark:border-white/10">
         <h2 className="font-semibold">Bring your own key instead?</h2>
         <p className="mt-2 text-sm opacity-70">
           HiveMind also runs fully BYOK -- export <code>DEEPSEEK_API_KEY</code> and skip hosted

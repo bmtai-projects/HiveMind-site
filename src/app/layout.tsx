@@ -17,9 +17,16 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "HiveMind -- a fast, cost-optimized DeepSeek coding agent",
+  title: "HiveMind",
+  applicationName: "HiveMind",
   description:
-    "Sign in, top up your balance, and run the HiveMind CLI coding agent -- no DeepSeek API key of your own required.",
+    "HiveMind is a terminal coding agent powered by DeepSeek. Sign in with Google to create an account, top up a prepaid balance, and run the hivemind CLI without needing your own DeepSeek API key. We request your Google email only to identify your account and track your balance -- see our Privacy Policy for details.",
+  openGraph: {
+    title: "HiveMind",
+    siteName: "HiveMind",
+    description: "A terminal coding agent powered by DeepSeek. Sign in, top up, and run hivemind -- no API key of your own required.",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
