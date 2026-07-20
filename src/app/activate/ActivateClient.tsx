@@ -2,11 +2,11 @@
 
 import { load as loadCashfree } from "@cashfreepayments/cashfree-js";
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { approveDevice, createCheckout } from "@/lib/apiClient";
 import { cashfreeMode, isFirebaseConfigured, TOPUP_PACKAGES_USD } from "@/lib/config";
-import { signInWithGoogle } from "@/lib/firebaseClient";
+import { beginGoogleSignIn, consumeRedirectResult } from "@/lib/firebaseClient";
 
 type DeviceStatus = "idle" | "approving" | "approved" | "error";
 type CheckoutStatus = "idle" | "creating" | "error";
@@ -15,6 +15,7 @@ export function ActivateClient() {
   const searchParams = useSearchParams();
   const [userCode, setUserCode] = useState(searchParams.get("user_code") ?? "");
   const [session, setSession] = useState<{ email: string; idToken: string } | null>(null);
+  const [checkingRedirect, setCheckingRedirect] = useState(isFirebaseConfigured);
   const [signingIn, setSigningIn] = useState(false);
   const [signInError, setSignInError] = useState<string | null>(null);
   const [deviceStatus, setDeviceStatus] = useState<DeviceStatus>("idle");
@@ -23,19 +24,36 @@ export function ActivateClient() {
   const [checkoutStatus, setCheckoutStatus] = useState<CheckoutStatus>("idle");
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
+  // Runs on every load, including the return trip from beginGoogleSignIn()'s
+  // full-page redirect -- Firebase preserves the current URL (so ?user_code=
+  // survives the round trip) and getRedirectResult() resolves null on a
+  // normal, non-redirect visit, so this is always safe to call.
+  useEffect(() => {
+    if (!isFirebaseConfigured) return;
+    consumeRedirectResult()
+      .then((result) => {
+        if (!result) return;
+        setSession(result);
+        if (userCode.trim()) {
+          void approve(result.idToken);
+        }
+      })
+      .catch((err) => {
+        setSignInError(err instanceof Error ? err.message : "Sign-in failed");
+      })
+      .finally(() => setCheckingRedirect(false));
+    // Deliberately run once on mount to consume a pending redirect result.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   async function handleSignIn() {
     setSigningIn(true);
     setSignInError(null);
     try {
-      const result = await signInWithGoogle();
-      setSession(result);
-      if (userCode.trim()) {
-        await approve(result.idToken);
-      }
+      await beginGoogleSignIn(); // navigates away; nothing after this runs
     } catch (err) {
-      setSignInError(err instanceof Error ? err.message : "Sign-in failed");
-    } finally {
       setSigningIn(false);
+      setSignInError(err instanceof Error ? err.message : "Sign-in failed");
     }
   }
 
@@ -74,6 +92,10 @@ export function ActivateClient() {
     );
   }
 
+  if (checkingRedirect) {
+    return <p className="text-sm opacity-60">Checking sign-in...</p>;
+  }
+
   return (
     <div className="space-y-8">
       {!session && (
@@ -96,7 +118,7 @@ export function ActivateClient() {
             disabled={signingIn}
             className="w-full rounded-md bg-cyan-500 px-5 py-2.5 font-medium text-black hover:bg-cyan-400 disabled:opacity-50"
           >
-            {signingIn ? "Signing in..." : "Sign in with Google"}
+            {signingIn ? "Redirecting to Google..." : "Sign in with Google"}
           </button>
           {signInError && <p className="text-sm text-red-500">{signInError}</p>}
         </div>

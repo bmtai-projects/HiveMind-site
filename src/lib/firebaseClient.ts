@@ -1,5 +1,12 @@
 import { type FirebaseApp, getApps, initializeApp } from "firebase/app";
-import { type Auth, GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
+import {
+  type Auth,
+  type User,
+  GoogleAuthProvider,
+  getAuth,
+  getRedirectResult,
+  signInWithRedirect,
+} from "firebase/auth";
 
 import { firebaseConfig, isFirebaseConfigured } from "./config";
 
@@ -23,10 +30,31 @@ function getFirebaseAuth(): Auth {
   return auth;
 }
 
-/** Returns the signed-in user's Firebase ID token, to hand to the backend as `credential`. */
-export async function signInWithGoogle(): Promise<{ email: string; idToken: string }> {
-  const authInstance = getFirebaseAuth();
-  const result = await signInWithPopup(authInstance, new GoogleAuthProvider());
-  const idToken = await result.user.getIdToken();
-  return { email: result.user.email ?? "", idToken };
+/**
+ * Full-page redirect, not a popup. `signInWithPopup` gets silently killed
+ * by third-party-cookie blocking / popup blockers in a lot of current
+ * browsers -- the failure mode is exactly "the popup closes right after
+ * picking an account, no error shown." Redirect is Firebase's own
+ * recommended fallback for that and doesn't hit the same class of bug.
+ * This navigates the whole page away; call `consumeRedirectResult()` on
+ * the next page load to pick up the result.
+ */
+export function beginGoogleSignIn(): Promise<void> {
+  return signInWithRedirect(getFirebaseAuth(), new GoogleAuthProvider());
+}
+
+async function toSession(user: User): Promise<{ email: string; idToken: string }> {
+  const idToken = await user.getIdToken();
+  return { email: user.email ?? "", idToken };
+}
+
+/**
+ * Call once on every page load. Resolves to the signed-in session if this
+ * load is the return trip from `beginGoogleSignIn()`, or `null` on a
+ * normal (non-redirect) page load -- safe to call unconditionally.
+ */
+export async function consumeRedirectResult(): Promise<{ email: string; idToken: string } | null> {
+  const result = await getRedirectResult(getFirebaseAuth());
+  if (!result) return null;
+  return toSession(result.user);
 }
