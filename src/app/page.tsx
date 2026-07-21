@@ -13,7 +13,7 @@ const steps = [
   },
   {
     title: "Top up and go",
-    body: "Add funds from ₹500. No API key to manage -- pay only for the tokens you actually use.",
+    body: "Add funds from ₹10. No API key to manage -- pay only for the tokens you actually use.",
     code: "hivemind activate",
   },
 ];

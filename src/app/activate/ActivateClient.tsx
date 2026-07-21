@@ -5,11 +5,18 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 import { approveDevice, createCheckout } from "@/lib/apiClient";
-import { cashfreeMode, isFirebaseConfigured, TOPUP_PACKAGES_INR } from "@/lib/config";
+import { MAX_TOPUP_INR, MIN_TOPUP_INR, PRESET_TOPUPS_INR, cashfreeMode, isFirebaseConfigured } from "@/lib/config";
 import { beginGoogleSignIn, checkRedirectError, watchAuthState } from "@/lib/firebaseClient";
 
 type DeviceStatus = "idle" | "approving" | "approved" | "error";
 type CheckoutStatus = "idle" | "creating" | "error";
+
+const DEFAULT_TOPUP_INR = 500;
+
+function clampTopup(value: number): number {
+  if (!Number.isFinite(value)) return DEFAULT_TOPUP_INR;
+  return Math.min(MAX_TOPUP_INR, Math.max(MIN_TOPUP_INR, Math.round(value)));
+}
 
 export function ActivateClient() {
   const searchParams = useSearchParams();
@@ -21,9 +28,16 @@ export function ActivateClient() {
   const [deviceStatus, setDeviceStatus] = useState<DeviceStatus>("idle");
   const [deviceError, setDeviceError] = useState<string | null>(null);
   const [phone, setPhone] = useState("");
+  const [amount, setAmount] = useState(DEFAULT_TOPUP_INR);
+  const [amountDraft, setAmountDraft] = useState(String(DEFAULT_TOPUP_INR));
   const [checkoutStatus, setCheckoutStatus] = useState<CheckoutStatus>("idle");
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const autoApproveAttempted = useRef(false);
+
+  function selectAmount(value: number) {
+    setAmount(value);
+    setAmountDraft(String(value));
+  }
 
   // watchAuthState is the reliable signal -- it reads Firebase's own
   // persisted auth state rather than trying to correlate a redirect result
@@ -175,20 +189,62 @@ export function ActivateClient() {
                 className="mt-1.5 w-full rounded-md border border-black/15 bg-transparent px-3 py-2 dark:border-white/20"
               />
             </div>
-            <div className="flex gap-3">
-              {TOPUP_PACKAGES_INR.map((amount) => (
-                <button
-                  key={amount}
-                  type="button"
-                  onClick={() => handleTopup(amount)}
-                  disabled={checkoutStatus === "creating" || phone.trim().length < 6}
-                  className="flex-1 rounded-md border border-black/15 py-2.5 font-medium hover:bg-black/5 disabled:opacity-40 dark:border-white/20 dark:hover:bg-white/10"
-                >
-                  ₹{amount}
-                </button>
-              ))}
+            <div>
+              <label className="block text-sm font-medium">Amount</label>
+              <div className="mt-1.5 flex flex-wrap gap-2">
+                {PRESET_TOPUPS_INR.map((preset) => (
+                  <button
+                    key={preset}
+                    type="button"
+                    onClick={() => selectAmount(preset)}
+                    className={`rounded-md border px-3 py-1.5 text-sm font-medium ${
+                      amount === preset
+                        ? "border-cyan-500 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400"
+                        : "border-black/15 hover:bg-black/5 dark:border-white/20 dark:hover:bg-white/10"
+                    }`}
+                  >
+                    ₹{preset}
+                  </button>
+                ))}
+              </div>
+
+              <div className="mt-4 flex items-center gap-4">
+                <input
+                  type="range"
+                  min={MIN_TOPUP_INR}
+                  max={MAX_TOPUP_INR}
+                  step={10}
+                  value={amount}
+                  onChange={(e) => selectAmount(Number(e.target.value))}
+                  className="h-2 flex-1 cursor-pointer accent-cyan-500"
+                  aria-label="Top-up amount in rupees"
+                />
+                <div className="flex items-center gap-1 rounded-md border border-black/15 px-2 py-1.5 dark:border-white/20">
+                  <span className="text-sm opacity-60">₹</span>
+                  <input
+                    type="number"
+                    min={MIN_TOPUP_INR}
+                    max={MAX_TOPUP_INR}
+                    value={amountDraft}
+                    onChange={(e) => setAmountDraft(e.target.value)}
+                    onBlur={() => selectAmount(clampTopup(Number(amountDraft)))}
+                    className="w-20 bg-transparent text-right font-medium outline-none"
+                  />
+                </div>
+              </div>
+              <p className="mt-1.5 text-xs opacity-50">
+                Any amount from ₹{MIN_TOPUP_INR} to ₹{MAX_TOPUP_INR.toLocaleString("en-IN")}
+              </p>
             </div>
-            {checkoutStatus === "creating" && <p className="text-sm opacity-70">Starting checkout...</p>}
+
+            <button
+              type="button"
+              onClick={() => handleTopup(amount)}
+              disabled={checkoutStatus === "creating" || phone.trim().length < 6}
+              className="w-full rounded-md bg-cyan-500 px-5 py-2.5 font-medium text-black hover:bg-cyan-400 disabled:opacity-50"
+            >
+              {checkoutStatus === "creating" ? "Starting checkout..." : `Top up ₹${amount}`}
+            </button>
             {checkoutError && <p className="text-sm text-red-500">{checkoutError}</p>}
           </div>
         </div>

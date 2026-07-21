@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-const packages = [500, 2000, 5000];
+import { MAX_TOPUP_INR, MIN_TOPUP_INR, PRESET_TOPUPS_INR } from "@/lib/config";
 
 export default function PricingPage() {
   return (
@@ -11,13 +11,21 @@ export default function PricingPage() {
         at cost -- there is no separate HiveMind plan fee.
       </p>
 
-      <div className="mt-10 grid gap-4 sm:grid-cols-3">
-        {packages.map((amount) => (
-          <div key={amount} className="rounded-lg border border-black/10 p-6 text-center dark:border-white/10">
-            <div className="text-3xl font-semibold">₹{amount}</div>
-            <div className="mt-1 text-sm opacity-60">one-time top-up</div>
-          </div>
-        ))}
+      <div className="mt-10 rounded-lg border border-black/10 p-6 text-center dark:border-white/10">
+        <div className="text-3xl font-semibold">
+          ₹{MIN_TOPUP_INR} -- ₹{MAX_TOPUP_INR.toLocaleString("en-IN")}
+        </div>
+        <div className="mt-1 text-sm opacity-60">top up any amount in that range, via a slider on /activate</div>
+        <div className="mt-4 flex justify-center gap-2">
+          {PRESET_TOPUPS_INR.map((amount) => (
+            <span
+              key={amount}
+              className="rounded-md border border-black/15 px-3 py-1 text-sm opacity-70 dark:border-white/20"
+            >
+              ₹{amount}
+            </span>
+          ))}
+        </div>
       </div>
 
       <div className="mt-10 rounded-lg border border-black/10 p-6 dark:border-white/10">

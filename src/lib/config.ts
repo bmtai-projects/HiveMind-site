@@ -18,4 +18,9 @@ export const isFirebaseConfigured = Boolean(
 
 export const cashfreeMode = process.env.NEXT_PUBLIC_CASHFREE_MODE === "production" ? "production" : "sandbox";
 
-export const TOPUP_PACKAGES_INR = [500, 2000, 5000] as const;
+// Quick-select amounts shown alongside the top-up slider -- the backend
+// accepts any integer amount_inr in [MIN_TOPUP_INR, MAX_TOPUP_INR], these
+// are just shortcuts, not the only valid values.
+export const PRESET_TOPUPS_INR = [200, 500, 1000] as const;
+export const MIN_TOPUP_INR = 10;
+export const MAX_TOPUP_INR = 10_000;
