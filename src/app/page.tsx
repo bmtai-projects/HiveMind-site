@@ -22,9 +22,8 @@ export default function Home() {
   return (
     <div className="mx-auto max-w-5xl px-6 py-16 sm:py-24">
       <section className="max-w-2xl">
-        <p className="text-sm font-semibold uppercase tracking-wide text-cyan-500">HiveMind</p>
-        <h1 className="mt-2 text-4xl font-semibold tracking-tight sm:text-5xl">
-          A fast, cost-optimized coding agent, running on DeepSeek.
+        <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
+          HiveMind: a fast, cost-optimized coding agent, running on DeepSeek.
         </h1>
         <p className="mt-6 text-lg opacity-80">
           HiveMind is a terminal coding agent -- read/write files, run shell commands, multi-turn
