@@ -35,8 +35,8 @@ export default function PrivacyPage() {
             <li>Google Firebase -- authentication and account storage.</li>
             <li>Cashfree -- payment processing.</li>
             <li>
-              Our upstream model provider (DeepSeek) -- receives the prompts and files you
-              explicitly send through the CLI, in order to generate a response. Nothing else.
+              Our AI model provider -- receives the prompts and files you explicitly send through
+              the CLI, in order to generate a response. Nothing else.
             </li>
           </ul>
         </section>

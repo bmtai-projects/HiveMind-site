@@ -13,7 +13,7 @@ const steps = [
   },
   {
     title: "Top up and go",
-    body: "Add funds from $5. No DeepSeek account, no API key to manage -- pay only for the tokens you actually use.",
+    body: "Add funds from $5. No API key to manage -- pay only for the tokens you actually use.",
     code: "hivemind activate",
   },
 ];
@@ -23,12 +23,12 @@ export default function Home() {
     <div className="mx-auto max-w-5xl px-6 py-16 sm:py-24">
       <section className="max-w-2xl">
         <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
-          HiveMind: a fast, cost-optimized coding agent, running on DeepSeek.
+          HiveMind: a fast, cost-optimized AI coding agent.
         </h1>
         <p className="mt-6 text-lg opacity-80">
-          HiveMind is a terminal coding agent -- read/write files, run shell commands, multi-turn
-          conversations, automatic context compaction. Sign in once, top up your balance, and skip
-          managing your own DeepSeek API key entirely.
+          HiveMind is a terminal coding agent, powered by HiveMind AI -- read/write files, run
+          shell commands, multi-turn conversations, automatic context compaction. Sign in once,
+          top up your balance, and skip managing your own API key entirely.
         </p>
         <div className="mt-8 flex flex-wrap gap-4">
           <Link
@@ -70,15 +70,6 @@ export default function Home() {
             Privacy Policy
           </Link>
           .
-        </p>
-      </section>
-
-      <section className="mt-6 rounded-lg border border-black/10 p-6 dark:border-white/10">
-        <h2 className="font-semibold">Bring your own key instead?</h2>
-        <p className="mt-2 text-sm opacity-70">
-          HiveMind also runs fully BYOK -- export <code>DEEPSEEK_API_KEY</code> and skip hosted
-          billing entirely. Hosted mode is for anyone who&apos;d rather not manage a DeepSeek
-          account of their own.
         </p>
       </section>
     </div>

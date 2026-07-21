@@ -23,7 +23,7 @@ export default function PricingPage() {
       <div className="mt-10 rounded-lg border border-black/10 p-6 dark:border-white/10">
         <h2 className="font-semibold">How usage is charged</h2>
         <p className="mt-2 text-sm opacity-70">
-          Every request is metered against DeepSeek&apos;s own per-token pricing for the model
+          Every request is metered against HiveMind AI&apos;s own per-token pricing for the model
           tier used (Flash or Pro). Before any request is sent, HiveMind reserves a conservative
           upper-bound estimate against your balance; once the response completes, you&apos;re
           settled down to the real cost and the difference is returned automatically. If a request

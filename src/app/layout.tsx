@@ -20,11 +20,11 @@ export const metadata: Metadata = {
   title: "HiveMind",
   applicationName: "HiveMind",
   description:
-    "HiveMind is a terminal coding agent powered by DeepSeek. Sign in with Google to create an account, top up a prepaid balance, and run the hivemind CLI without needing your own DeepSeek API key. We request your Google email only to identify your account and track your balance -- see our Privacy Policy for details.",
+    "HiveMind is a terminal coding agent powered by HiveMind AI. Sign in with Google to create an account, top up a prepaid balance, and run the hivemind CLI without needing your own API key. We request your Google email only to identify your account and track your balance -- see our Privacy Policy for details.",
   openGraph: {
     title: "HiveMind",
     siteName: "HiveMind",
-    description: "A terminal coding agent powered by DeepSeek. Sign in, top up, and run hivemind -- no API key of your own required.",
+    description: "A terminal coding agent powered by HiveMind AI. Sign in, top up, and run hivemind -- no API key of your own required.",
     type: "website",
   },
 };
