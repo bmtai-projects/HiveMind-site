@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { approveDevice, createCheckout } from "@/lib/apiClient";
 import { MAX_TOPUP_INR, MIN_TOPUP_INR, PRESET_TOPUPS_INR, cashfreeMode, isFirebaseConfigured } from "@/lib/config";
-import { beginGoogleSignIn, checkRedirectError, watchAuthState } from "@/lib/firebaseClient";
+import { beginGoogleSignIn, completeRedirectSignIn, watchAuthState } from "@/lib/firebaseClient";
 
 type DeviceStatus = "idle" | "approving" | "approved" | "error";
 type CheckoutStatus = "idle" | "creating" | "error";
@@ -39,29 +39,45 @@ export function ActivateClient() {
     setAmountDraft(String(value));
   }
 
-  // watchAuthState is the reliable signal -- it reads Firebase's own
-  // persisted auth state rather than trying to correlate a redirect result
-  // across this app's origin and Firebase's separate authDomain, which can
-  // silently resolve to nothing with no error (confirmed happening live on
-  // this deployment). checkRedirectError runs alongside it purely to
-  // surface a *real* failure (e.g. the OAuth exchange itself erroring).
+  // Order matters. `completeRedirectSignIn()` is awaited *first* because
+  // awaiting it is what drives a pending redirect to completion -- until it
+  // resolves, the auth-state listener can legitimately report "signed out"
+  // mid-flight, which is exactly how a successful sign-in ends up rendering
+  // the sign-in button again. Only once it settles do we stop showing the
+  // loading state; `watchAuthState` then keeps things live from there.
   useEffect(() => {
     if (!isFirebaseConfigured) return;
 
-    checkRedirectError().catch((err) => {
-      setSignInError(err instanceof Error ? err.message : "Sign-in failed");
-    });
+    let cancelled = false;
 
-    const unsubscribe = watchAuthState((result) => {
-      setCheckingRedirect(false);
+    const applySession = (result: { email: string; idToken: string } | null) => {
+      if (cancelled) return;
       setSession(result);
       if (result && userCode.trim() && !autoApproveAttempted.current) {
         autoApproveAttempted.current = true;
         void approve(result.idToken);
       }
-    });
+    };
 
-    return unsubscribe;
+    completeRedirectSignIn()
+      .then(applySession)
+      .catch((err) => {
+        if (cancelled) return;
+        // Never bounce back to the sign-in button with nothing shown -- a
+        // silent failure here is unactionable for the user and undebuggable
+        // for us.
+        setSignInError(err instanceof Error ? err.message : "Sign-in failed");
+      })
+      .finally(() => {
+        if (!cancelled) setCheckingRedirect(false);
+      });
+
+    const unsubscribe = watchAuthState(applySession);
+
+    return () => {
+      cancelled = true;
+      unsubscribe();
+    };
     // Deliberately run once on mount; userCode is read fresh inside the
     // callback via closure and doesn't change after sign-in starts.
     // eslint-disable-next-line react-hooks/exhaustive-deps
