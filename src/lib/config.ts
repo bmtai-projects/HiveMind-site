@@ -18,4 +18,4 @@ export const isFirebaseConfigured = Boolean(
 
 export const cashfreeMode = process.env.NEXT_PUBLIC_CASHFREE_MODE === "production" ? "production" : "sandbox";
 
-export const TOPUP_PACKAGES_USD = [5, 20, 50] as const;
+export const TOPUP_PACKAGES_INR = [500, 2000, 5000] as const;

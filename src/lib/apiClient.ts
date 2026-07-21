@@ -30,7 +30,7 @@ export async function approveDevice(userCode: string, credential: string): Promi
 
 export async function createCheckout(
   accessToken: string,
-  amountUsd: number,
+  amountInr: number,
   phone: string,
 ): Promise<{ order_id: string; payment_session_id: string }> {
   const res = await fetch(`${API_BASE}/billing/checkout`, {
@@ -39,7 +39,7 @@ export async function createCheckout(
       "content-type": "application/json",
       authorization: `Bearer ${accessToken}`,
     },
-    body: JSON.stringify({ amount_usd: amountUsd, phone }),
+    body: JSON.stringify({ amount_inr: amountInr, phone }),
   });
   if (!res.ok) throw new Error(await parseError(res));
   return res.json();

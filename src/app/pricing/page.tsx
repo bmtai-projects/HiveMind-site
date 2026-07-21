@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-const packages = [5, 20, 50];
+const packages = [500, 2000, 5000];
 
 export default function PricingPage() {
   return (
@@ -14,7 +14,7 @@ export default function PricingPage() {
       <div className="mt-10 grid gap-4 sm:grid-cols-3">
         {packages.map((amount) => (
           <div key={amount} className="rounded-lg border border-black/10 p-6 text-center dark:border-white/10">
-            <div className="text-3xl font-semibold">${amount}</div>
+            <div className="text-3xl font-semibold">₹{amount}</div>
             <div className="mt-1 text-sm opacity-60">one-time top-up</div>
           </div>
         ))}

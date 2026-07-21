@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 import { approveDevice, createCheckout } from "@/lib/apiClient";
-import { cashfreeMode, isFirebaseConfigured, TOPUP_PACKAGES_USD } from "@/lib/config";
+import { cashfreeMode, isFirebaseConfigured, TOPUP_PACKAGES_INR } from "@/lib/config";
 import { beginGoogleSignIn, checkRedirectError, watchAuthState } from "@/lib/firebaseClient";
 
 type DeviceStatus = "idle" | "approving" | "approved" | "error";
@@ -76,12 +76,12 @@ export function ActivateClient() {
     }
   }
 
-  async function handleTopup(amountUsd: number) {
+  async function handleTopup(amountInr: number) {
     if (!session) return;
     setCheckoutStatus("creating");
     setCheckoutError(null);
     try {
-      const { payment_session_id } = await createCheckout(session.idToken, amountUsd, phone.trim());
+      const { payment_session_id } = await createCheckout(session.idToken, amountInr, phone.trim());
       const cashfree = await loadCashfree({ mode: cashfreeMode });
       if (!cashfree) throw new Error("Checkout failed to load");
       await cashfree.checkout({ paymentSessionId: payment_session_id, redirectTarget: "_self" });
@@ -176,7 +176,7 @@ export function ActivateClient() {
               />
             </div>
             <div className="flex gap-3">
-              {TOPUP_PACKAGES_USD.map((amount) => (
+              {TOPUP_PACKAGES_INR.map((amount) => (
                 <button
                   key={amount}
                   type="button"
@@ -184,7 +184,7 @@ export function ActivateClient() {
                   disabled={checkoutStatus === "creating" || phone.trim().length < 6}
                   className="flex-1 rounded-md border border-black/15 py-2.5 font-medium hover:bg-black/5 disabled:opacity-40 dark:border-white/20 dark:hover:bg-white/10"
                 >
-                  ${amount}
+                  ₹{amount}
                 </button>
               ))}
             </div>
