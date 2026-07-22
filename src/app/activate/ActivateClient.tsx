@@ -59,24 +59,44 @@ export function ActivateClient() {
       }
     };
 
-    completeRedirectSignIn()
-      .then(applySession)
-      .catch((err) => {
-        if (cancelled) return;
-        // Never bounce back to the sign-in button with nothing shown -- a
-        // silent failure here is unactionable for the user and undebuggable
-        // for us.
-        setSignInError(err instanceof Error ? err.message : "Sign-in failed");
-      })
-      .finally(() => {
-        if (!cancelled) setCheckingRedirect(false);
-      });
+    const checkRedirect = () => {
+      setCheckingRedirect(true);
+      completeRedirectSignIn()
+        .then(applySession)
+        .catch((err) => {
+          if (cancelled) return;
+          // Never bounce back to the sign-in button with nothing shown -- a
+          // silent failure here is unactionable for the user and undebuggable
+          // for us.
+          setSignInError(err instanceof Error ? err.message : "Sign-in failed");
+        })
+        .finally(() => {
+          if (!cancelled) setCheckingRedirect(false);
+        });
+    };
+
+    checkRedirect();
 
     const unsubscribe = watchAuthState(applySession);
+
+    // Safari's back/forward cache can restore this exact page -- frozen JS
+    // state and all -- instead of running a fresh page load when Google's
+    // OAuth redirect chain lands back here. When that happens this effect
+    // never re-runs, so the one-shot `getRedirectResult()` check inside it
+    // never gets a chance to see the completed sign-in, and the page just
+    // sits on the pre-auth UI with the code still showing (Chrome doesn't
+    // do this for this redirect chain, which is why it only reproduces in
+    // Safari). `pageshow` with `persisted: true` is WebKit's own signal for
+    // exactly that restore, so re-run the check when it fires.
+    const onPageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) checkRedirect();
+    };
+    window.addEventListener("pageshow", onPageShow);
 
     return () => {
       cancelled = true;
       unsubscribe();
+      window.removeEventListener("pageshow", onPageShow);
     };
     // Deliberately run once on mount; userCode is read fresh inside the
     // callback via closure and doesn't change after sign-in starts.
