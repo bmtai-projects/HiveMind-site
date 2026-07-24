@@ -1,10 +1,22 @@
 import Link from "next/link";
 
-const steps = [
+type CodeVariant = { label: string; code: string };
+type Step = { title: string; body: string; code: string | CodeVariant[] };
+
+const steps: Step[] = [
   {
     title: "Install",
     body: "Download the hivemind binary for your platform and install it with one command -- no source access needed.",
-    code: "curl -fsSL https://raw.githubusercontent.com/BibhabenduMukherjee/HiveMind-releases/main/install.sh | bash",
+    code: [
+      {
+        label: "macOS / Linux",
+        code: "curl -fsSL https://raw.githubusercontent.com/BibhabenduMukherjee/HiveMind-releases/main/install.sh | bash",
+      },
+      {
+        label: "Windows (PowerShell)",
+        code: "irm https://raw.githubusercontent.com/BibhabenduMukherjee/HiveMind-releases/main/install.ps1 | iex",
+      },
+    ],
   },
   {
     title: "Activate",
@@ -52,9 +64,24 @@ export default function Home() {
             <div className="font-mono text-sm opacity-50">{`0${i + 1}`}</div>
             <h2 className="mt-2 font-semibold">{step.title}</h2>
             <p className="mt-2 text-sm opacity-70">{step.body}</p>
-            <pre className="mt-4 overflow-x-auto rounded bg-black/5 p-3 text-xs dark:bg-white/10">
-              <code>{step.code}</code>
-            </pre>
+            {Array.isArray(step.code) ? (
+              <div className="mt-4 space-y-3">
+                {step.code.map((variant) => (
+                  <div key={variant.label}>
+                    <div className="text-[11px] font-medium uppercase tracking-wide opacity-50">
+                      {variant.label}
+                    </div>
+                    <pre className="mt-1 overflow-x-auto rounded bg-black/5 p-3 text-xs dark:bg-white/10">
+                      <code>{variant.code}</code>
+                    </pre>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <pre className="mt-4 overflow-x-auto rounded bg-black/5 p-3 text-xs dark:bg-white/10">
+                <code>{step.code}</code>
+              </pre>
+            )}
           </div>
         ))}
       </section>
