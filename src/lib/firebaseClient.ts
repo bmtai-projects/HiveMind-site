@@ -5,10 +5,9 @@ import {
   GoogleAuthProvider,
   browserLocalPersistence,
   getAuth,
-  getRedirectResult,
   onAuthStateChanged,
   setPersistence,
-  signInWithRedirect,
+  signInWithCredential,
 } from "firebase/auth";
 
 import { firebaseConfig, isFirebaseConfigured } from "./config";
@@ -33,24 +32,6 @@ function getFirebaseAuth(): Auth {
   return auth;
 }
 
-/**
- * Full-page redirect, not a popup. `signInWithPopup` gets silently killed
- * by third-party-cookie blocking / popup blockers in a lot of current
- * browsers -- the failure mode is exactly "the popup closes right after
- * picking an account, no error shown." Redirect is Firebase's own
- * recommended fallback for that and doesn't hit the same class of bug.
- * This navigates the whole page away; call `consumeRedirectResult()` on
- * the next page load to pick up the result.
- */
-export async function beginGoogleSignIn(): Promise<void> {
-  const auth = getFirebaseAuth();
-  // Persist across the full-page redirect explicitly rather than relying on
-  // the default. The redirect leaves and re-enters this origin, so the
-  // session has to survive a document teardown, not just a re-render.
-  await setPersistence(auth, browserLocalPersistence);
-  return signInWithRedirect(auth, new GoogleAuthProvider());
-}
-
 export interface Session {
   email: string;
   idToken: string;
@@ -62,32 +43,35 @@ async function toSession(user: User): Promise<Session> {
 }
 
 /**
- * Call once on every page load, before trusting `auth.currentUser`.
+ * Turn a Google-issued ID token (obtained by Google Identity Services in
+ * the browser) into a Firebase session.
  *
- * Awaiting this is what actually *drives* a pending redirect to
- * completion; until it resolves, `onAuthStateChanged` can legitimately
- * report `null` even though a sign-in is mid-flight. Racing the two (fire
- * this off un-awaited and let the listener decide) is what produced the
- * "lands back on the sign-in screen with no error" symptom.
- *
- * Returns the session if this page load *was* the tail of a redirect,
- * `null` if there was no redirect pending. Throws on a genuine OAuth
- * failure, which the caller is expected to render -- a silent bounce back
- * to the sign-in button is the one outcome that must never happen.
+ * This is deliberately NOT `signInWithRedirect`/`signInWithPopup`. Those
+ * flows hand the session off through cross-origin storage on the Firebase
+ * `authDomain`, which Safari's ITP partitions/evicts -- the exact reason
+ * sign-in worked in Chrome but silently bounced back to the sign-in screen
+ * in Safari. `signInWithCredential` instead is a plain first-party API call
+ * to Firebase: GIS returns the Google ID token straight to our own page,
+ * and the resulting Firebase session is persisted in *our* origin's
+ * IndexedDB (first-party, never partitioned). No cross-origin storage
+ * handoff exists anywhere in this path, so it behaves identically across
+ * browsers. The backend is unchanged -- it still receives and verifies a
+ * Firebase ID token exactly as before.
  */
-export async function completeRedirectSignIn(): Promise<Session | null> {
+export async function signInWithGoogleCredential(googleIdToken: string): Promise<Session> {
   const auth = getFirebaseAuth();
-  const result = await getRedirectResult(auth);
-  if (result?.user) return toSession(result.user);
-  if (auth.currentUser) return toSession(auth.currentUser);
-  return null;
+  await setPersistence(auth, browserLocalPersistence);
+  const credential = GoogleAuthProvider.credential(googleIdToken);
+  const result = await signInWithCredential(auth, credential);
+  return toSession(result.user);
 }
 
 /**
- * The reliable way to detect a completed sign-in: Firebase's own
- * persisted auth state, independent of the redirect-result correlation
- * above. Fires immediately with the current state, then again on any
- * change. Returns an unsubscribe function.
+ * The reliable way to detect an already-completed sign-in: Firebase's own
+ * persisted auth state. Fires immediately with the current state (so a user
+ * who signed in on a previous visit is recognized on load without any
+ * network round trip needed to render), then again on any change. Returns
+ * an unsubscribe function.
  */
 export function watchAuthState(callback: (session: Session | null) => void): () => void {
   return onAuthStateChanged(getFirebaseAuth(), (user) => {

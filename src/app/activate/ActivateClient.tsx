@@ -2,11 +2,20 @@
 
 import { load as loadCashfree } from "@cashfreepayments/cashfree-js";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import Script from "next/script";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { approveDevice, createCheckout } from "@/lib/apiClient";
-import { MAX_TOPUP_INR, MIN_TOPUP_INR, PRESET_TOPUPS_INR, cashfreeMode, isFirebaseConfigured } from "@/lib/config";
-import { beginGoogleSignIn, completeRedirectSignIn, watchAuthState } from "@/lib/firebaseClient";
+import {
+  MAX_TOPUP_INR,
+  MIN_TOPUP_INR,
+  PRESET_TOPUPS_INR,
+  cashfreeMode,
+  googleClientId,
+  isFirebaseConfigured,
+  isGoogleSignInConfigured,
+} from "@/lib/config";
+import { signInWithGoogleCredential, watchAuthState } from "@/lib/firebaseClient";
 
 type DeviceStatus = "idle" | "approving" | "approved" | "error";
 type CheckoutStatus = "idle" | "creating" | "error";
@@ -22,8 +31,8 @@ export function ActivateClient() {
   const searchParams = useSearchParams();
   const [userCode, setUserCode] = useState(searchParams.get("user_code") ?? "");
   const [session, setSession] = useState<{ email: string; idToken: string } | null>(null);
-  const [checkingRedirect, setCheckingRedirect] = useState(isFirebaseConfigured);
-  const [signingIn, setSigningIn] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(isFirebaseConfigured);
+  const [gsiReady, setGsiReady] = useState(false);
   const [signInError, setSignInError] = useState<string | null>(null);
   const [deviceStatus, setDeviceStatus] = useState<DeviceStatus>("idle");
   const [deviceError, setDeviceError] = useState<string | null>(null);
@@ -33,92 +42,88 @@ export function ActivateClient() {
   const [checkoutStatus, setCheckoutStatus] = useState<CheckoutStatus>("idle");
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const autoApproveAttempted = useRef(false);
+  const googleButtonRef = useRef<HTMLDivElement | null>(null);
+  const userCodeRef = useRef(userCode);
+  userCodeRef.current = userCode;
 
   function selectAmount(value: number) {
     setAmount(value);
     setAmountDraft(String(value));
   }
 
-  // Order matters. `completeRedirectSignIn()` is awaited *first* because
-  // awaiting it is what drives a pending redirect to completion -- until it
-  // resolves, the auth-state listener can legitimately report "signed out"
-  // mid-flight, which is exactly how a successful sign-in ends up rendering
-  // the sign-in button again. Only once it settles do we stop showing the
-  // loading state; `watchAuthState` then keeps things live from there.
+  const applySession = useCallback((result: { email: string; idToken: string } | null) => {
+    setSession(result);
+    // Read the code through a ref so this callback is stable and doesn't
+    // need to be re-created (and re-subscribed) every keystroke in the code
+    // field, while still seeing the latest value at the moment sign-in lands.
+    if (result && userCodeRef.current.trim() && !autoApproveAttempted.current) {
+      autoApproveAttempted.current = true;
+      void approve(result.idToken);
+    }
+  }, []);
+
+  // Recognize an already-signed-in user (persisted from a previous visit in
+  // this browser's first-party storage) with no network round trip and no
+  // redirect to unwind. This is the whole auth-state story now that sign-in
+  // is a direct credential exchange rather than a page-navigating redirect.
   useEffect(() => {
+    // `checkingAuth` already initializes to `isFirebaseConfigured`, so when
+    // Firebase isn't configured it's already false -- nothing to do here.
     if (!isFirebaseConfigured) return;
-
     let cancelled = false;
-
-    const applySession = (result: { email: string; idToken: string } | null) => {
+    const unsubscribe = watchAuthState((result) => {
       if (cancelled) return;
-      setSession(result);
-      if (result && userCode.trim() && !autoApproveAttempted.current) {
-        autoApproveAttempted.current = true;
-        void approve(result.idToken);
-      }
-    };
-
-    const checkRedirect = () => {
-      setCheckingRedirect(true);
-      completeRedirectSignIn()
-        .then(applySession)
-        .catch((err) => {
-          if (cancelled) return;
-          // Never bounce back to the sign-in button with nothing shown -- a
-          // silent failure here is unactionable for the user and undebuggable
-          // for us.
-          setSignInError(err instanceof Error ? err.message : "Sign-in failed");
-        })
-        .finally(() => {
-          if (!cancelled) setCheckingRedirect(false);
-        });
-    };
-
-    checkRedirect();
-
-    const unsubscribe = watchAuthState(applySession);
-
-    // Safari's back/forward cache can restore this exact page -- frozen JS
-    // state and all -- instead of running a fresh page load when Google's
-    // OAuth redirect chain lands back here. When that happens this effect
-    // never re-runs, so the one-shot `getRedirectResult()` check inside it
-    // never gets a chance to see the completed sign-in, and the page just
-    // sits on the pre-auth UI with the code still showing (Chrome doesn't
-    // do this for this redirect chain, which is why it only reproduces in
-    // Safari). `pageshow` with `persisted: true` is WebKit's own signal for
-    // exactly that restore, so re-run the check when it fires.
-    const onPageShow = (event: PageTransitionEvent) => {
-      if (event.persisted) checkRedirect();
-    };
-    window.addEventListener("pageshow", onPageShow);
-
+      setCheckingAuth(false);
+      applySession(result);
+    });
     return () => {
       cancelled = true;
       unsubscribe();
-      window.removeEventListener("pageshow", onPageShow);
     };
-    // Deliberately run once on mount; userCode is read fresh inside the
-    // callback via closure and doesn't change after sign-in starts.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [applySession]);
 
-  async function handleSignIn() {
-    setSigningIn(true);
-    setSignInError(null);
-    try {
-      await beginGoogleSignIn(); // navigates away; nothing after this runs
-    } catch (err) {
-      setSigningIn(false);
-      setSignInError(err instanceof Error ? err.message : "Sign-in failed");
-    }
-  }
+  // Render Google Identity Services' button once its script has loaded and
+  // we know the user isn't already signed in. GIS returns a Google ID token
+  // straight to `handleCredential` in this same page (no redirect, no
+  // cross-origin storage), which we exchange for a Firebase session -- the
+  // path that behaves identically in Safari and Chrome.
+  useEffect(() => {
+    if (!gsiReady || session || checkingAuth) return;
+    if (!isGoogleSignInConfigured || !window.google || !googleButtonRef.current) return;
+
+    window.google.accounts.id.initialize({
+      client_id: googleClientId,
+      callback: (response) => {
+        setSignInError(null);
+        signInWithGoogleCredential(response.credential)
+          .then(applySession)
+          .catch((err) => {
+            setSignInError(err instanceof Error ? err.message : "Sign-in failed");
+          });
+      },
+      cancel_on_tap_outside: true,
+    });
+    window.google.accounts.id.renderButton(googleButtonRef.current, {
+      type: "standard",
+      theme: "filled_blue",
+      size: "large",
+      text: "signin_with",
+      shape: "rectangular",
+      logo_alignment: "left",
+    });
+  }, [gsiReady, session, checkingAuth, applySession]);
 
   async function approve(idToken: string) {
+    // Read the code from the ref, not a render closure: this is invoked from
+    // the stable `applySession` callback (captured once), so a closed-over
+    // `userCode` could be stale if the user typed it after load. The ref is
+    // always current.
+    const code = userCodeRef.current.trim();
+    if (!code) return;
     setDeviceStatus("approving");
     setDeviceError(null);
     try {
-      await approveDevice(userCode.trim(), idToken);
+      await approveDevice(code, idToken);
       setDeviceStatus("approved");
     } catch (err) {
       setDeviceStatus("error");
@@ -149,12 +154,22 @@ export function ActivateClient() {
     );
   }
 
-  if (checkingRedirect) {
+  if (checkingAuth) {
     return <p className="text-sm opacity-60">Checking sign-in...</p>;
   }
 
   return (
     <div className="space-y-8">
+      {/* GIS client library. `afterInteractive` is fine -- the sign-in
+          button is never the first thing a user needs, and `onLoad` gates
+          all use of `window.google` on the script actually being ready. */}
+      <Script
+        src="https://accounts.google.com/gsi/client"
+        strategy="afterInteractive"
+        onLoad={() => setGsiReady(true)}
+        onError={() => setSignInError("Could not load Google sign-in. Check your connection and retry.")}
+      />
+
       {!session && (
         <div className="space-y-4">
           <div>
@@ -169,14 +184,17 @@ export function ActivateClient() {
               className="mt-1.5 w-full rounded-md border border-black/15 bg-transparent px-3 py-2 font-mono uppercase tracking-widest dark:border-white/20"
             />
           </div>
-          <button
-            type="button"
-            onClick={handleSignIn}
-            disabled={signingIn}
-            className="w-full rounded-md bg-cyan-500 px-5 py-2.5 font-medium text-black hover:bg-cyan-400 disabled:opacity-50"
-          >
-            {signingIn ? "Redirecting to Google..." : "Sign in with Google"}
-          </button>
+          {!isGoogleSignInConfigured ? (
+            <p className="rounded-md border border-amber-500/30 bg-amber-500/10 p-4 text-sm">
+              Google sign-in isn&apos;t configured on this deployment yet (missing Google client ID).
+            </p>
+          ) : (
+            <>
+              {/* GIS renders its own button into this element. */}
+              <div ref={googleButtonRef} />
+              {!gsiReady && <p className="text-sm opacity-60">Loading Google sign-in...</p>}
+            </>
+          )}
           {signInError && <p className="text-sm text-red-500">{signInError}</p>}
         </div>
       )}

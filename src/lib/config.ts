@@ -18,6 +18,14 @@ export const isFirebaseConfigured = Boolean(
 
 export const cashfreeMode = process.env.NEXT_PUBLIC_CASHFREE_MODE === "production" ? "production" : "sandbox";
 
+// The OAuth Web Client ID that Google Identity Services (the "Sign in with
+// Google" button) initializes with. It is the *same* client ID Firebase's
+// Google provider already uses, so the ID token GIS returns is accepted by
+// `signInWithCredential` without any backend change. Public by design (it
+// ships to the browser); the matching client *secret* is never used here.
+export const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? "";
+export const isGoogleSignInConfigured = isFirebaseConfigured && googleClientId.length > 0;
+
 // Quick-select amounts shown alongside the top-up slider -- the backend
 // accepts any integer amount_inr in [MIN_TOPUP_INR, MAX_TOPUP_INR], these
 // are just shortcuts, not the only valid values.
