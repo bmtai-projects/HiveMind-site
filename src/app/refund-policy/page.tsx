@@ -1,7 +1,7 @@
 export default function RefundPolicyPage() {
   return (
     <div className="mx-auto max-w-3xl px-6 py-16">
-      <h1 className="text-3xl font-semibold tracking-tight">Refund Policy</h1>
+      <h1 className="font-display text-3xl font-semibold tracking-tight">Refund Policy</h1>
       <p className="mt-2 text-sm opacity-60">Last updated: July 2026</p>
 
       <div className="mt-8 space-y-6 text-sm leading-7 opacity-90">

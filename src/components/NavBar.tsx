@@ -7,27 +7,36 @@ const links = [
 
 export function NavBar() {
   return (
-    <header className="border-b border-black/10 dark:border-white/10">
+    <header className="border-b border-line">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-        <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight">
-          <span aria-hidden className="text-cyan-500">
+        <Link href="/" className="flex items-center gap-2 font-medium tracking-tight">
+          <span aria-hidden className="text-honey">
             ⬡
           </span>
           HiveMind
         </Link>
-        <nav className="flex items-center gap-6 text-sm">
-          {links.map((link) => (
-            <Link key={link.href} href={link.href} className="opacity-80 hover:opacity-100">
-              {link.label}
-            </Link>
-          ))}
+        <div className="flex items-center gap-4 sm:gap-6">
+          {/* Two secondary links don't fit next to the CTA below ~400px --
+              dropped rather than wrapped or hamburgered; both are one tap
+              away in the footer on mobile. */}
+          <nav className="hidden items-center gap-6 text-sm sm:flex">
+            {links.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-foreground/70 transition-colors hover:text-foreground"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
           <Link
             href="/activate"
-            className="rounded-md bg-cyan-500 px-3 py-1.5 font-medium text-black hover:bg-cyan-400"
+            className="rounded-md bg-honey px-3 py-1.5 text-sm font-medium text-ink transition-colors hover:bg-honey-strong"
           >
             Activate
           </Link>
-        </nav>
+        </div>
       </div>
     </header>
   );

@@ -148,14 +148,14 @@ export function ActivateClient() {
 
   if (!isFirebaseConfigured) {
     return (
-      <p className="rounded-md border border-amber-500/30 bg-amber-500/10 p-4 text-sm">
+      <p className="rounded-md border border-honey/30 bg-honey/10 p-4 text-sm">
         Sign-in isn&apos;t configured on this deployment yet (missing Firebase project config).
       </p>
     );
   }
 
   if (checkingAuth) {
-    return <p className="text-sm opacity-60">Checking sign-in...</p>;
+    return <p className="text-sm text-foreground/55">Checking sign-in...</p>;
   }
 
   return (
@@ -181,46 +181,48 @@ export function ActivateClient() {
               value={userCode}
               onChange={(e) => setUserCode(e.target.value)}
               placeholder="XXXX-XXXX"
-              className="mt-1.5 w-full rounded-md border border-black/15 bg-transparent px-3 py-2 font-mono uppercase tracking-widest dark:border-white/20"
+              className="mt-1.5 w-full rounded-md border border-line-strong bg-transparent px-3 py-2 font-mono tracking-widest uppercase"
             />
           </div>
           {!isGoogleSignInConfigured ? (
-            <p className="rounded-md border border-amber-500/30 bg-amber-500/10 p-4 text-sm">
+            <p className="rounded-md border border-honey/30 bg-honey/10 p-4 text-sm">
               Google sign-in isn&apos;t configured on this deployment yet (missing Google client ID).
             </p>
           ) : (
             <>
               {/* GIS renders its own button into this element. */}
               <div ref={googleButtonRef} />
-              {!gsiReady && <p className="text-sm opacity-60">Loading Google sign-in...</p>}
+              {!gsiReady && <p className="text-sm text-foreground/55">Loading Google sign-in...</p>}
             </>
           )}
-          {signInError && <p className="text-sm text-red-500">{signInError}</p>}
+          {signInError && <p className="text-sm text-pro">{signInError}</p>}
         </div>
       )}
 
       {session && (
         <div className="space-y-8">
-          <p className="text-sm opacity-70">
+          <p className="text-sm text-foreground/70">
             Signed in as <span className="font-medium">{session.email}</span>.
           </p>
 
           {userCode.trim() && (
-            <div className="rounded-md border border-black/10 p-4 dark:border-white/10">
-              {deviceStatus === "approving" && <p className="text-sm opacity-70">Approving...</p>}
+            <div className="rounded-md border border-line p-4">
+              {deviceStatus === "approving" && (
+                <p className="text-sm text-foreground/70">Approving...</p>
+              )}
               {deviceStatus === "approved" && (
-                <p className="text-sm text-emerald-500">
+                <p className="text-sm text-flash">
                   Device approved -- you can return to your terminal, it should sign in within a
                   few seconds.
                 </p>
               )}
               {deviceStatus === "error" && (
                 <div className="space-y-2">
-                  <p className="text-sm text-red-500">{deviceError}</p>
+                  <p className="text-sm text-pro">{deviceError}</p>
                   <button
                     type="button"
                     onClick={() => approve(session.idToken)}
-                    className="text-sm underline"
+                    className="text-sm underline underline-offset-2"
                   >
                     Try again
                   </button>
@@ -229,8 +231,8 @@ export function ActivateClient() {
             </div>
           )}
 
-          <div className="space-y-4 rounded-md border border-black/10 p-4 dark:border-white/10">
-            <h2 className="font-semibold">Add funds</h2>
+          <div className="space-y-4 rounded-md border border-line p-4">
+            <h2 className="font-medium">Add funds</h2>
             <div>
               <label htmlFor="phone" className="block text-sm font-medium">
                 Phone number
@@ -240,7 +242,7 @@ export function ActivateClient() {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="Required by our payment processor"
-                className="mt-1.5 w-full rounded-md border border-black/15 bg-transparent px-3 py-2 dark:border-white/20"
+                className="mt-1.5 w-full rounded-md border border-line-strong bg-transparent px-3 py-2"
               />
             </div>
             <div>
@@ -251,10 +253,10 @@ export function ActivateClient() {
                     key={preset}
                     type="button"
                     onClick={() => selectAmount(preset)}
-                    className={`rounded-md border px-3 py-1.5 text-sm font-medium ${
+                    className={`rounded-md border px-3 py-1.5 font-mono text-sm font-medium ${
                       amount === preset
-                        ? "border-cyan-500 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400"
-                        : "border-black/15 hover:bg-black/5 dark:border-white/20 dark:hover:bg-white/10"
+                        ? "border-honey bg-honey/10 text-honey-strong"
+                        : "border-line-strong hover:bg-foreground/5"
                     }`}
                   >
                     ₹{preset}
@@ -270,11 +272,11 @@ export function ActivateClient() {
                   step={10}
                   value={amount}
                   onChange={(e) => selectAmount(Number(e.target.value))}
-                  className="h-2 flex-1 cursor-pointer accent-cyan-500"
+                  className="h-2 flex-1 cursor-pointer accent-honey"
                   aria-label="Top-up amount in rupees"
                 />
-                <div className="flex items-center gap-1 rounded-md border border-black/15 px-2 py-1.5 dark:border-white/20">
-                  <span className="text-sm opacity-60">₹</span>
+                <div className="flex items-center gap-1 rounded-md border border-line-strong px-2 py-1.5">
+                  <span className="text-sm text-foreground/55">₹</span>
                   <input
                     type="number"
                     min={MIN_TOPUP_INR}
@@ -286,7 +288,7 @@ export function ActivateClient() {
                   />
                 </div>
               </div>
-              <p className="mt-1.5 text-xs opacity-50">
+              <p className="mt-1.5 text-xs text-foreground/50">
                 Any amount from ₹{MIN_TOPUP_INR} to ₹{MAX_TOPUP_INR.toLocaleString("en-IN")}
               </p>
             </div>
@@ -295,11 +297,11 @@ export function ActivateClient() {
               type="button"
               onClick={() => handleTopup(amount)}
               disabled={checkoutStatus === "creating" || phone.trim().length < 6}
-              className="w-full rounded-md bg-cyan-500 px-5 py-2.5 font-medium text-black hover:bg-cyan-400 disabled:opacity-50"
+              className="w-full rounded-md bg-honey px-5 py-2.5 font-medium text-ink transition-colors hover:bg-honey-strong disabled:opacity-50"
             >
               {checkoutStatus === "creating" ? "Starting checkout..." : `Top up ₹${amount}`}
             </button>
-            {checkoutError && <p className="text-sm text-red-500">{checkoutError}</p>}
+            {checkoutError && <p className="text-sm text-pro">{checkoutError}</p>}
           </div>
         </div>
       )}
