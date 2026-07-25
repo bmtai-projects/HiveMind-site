@@ -54,8 +54,8 @@ export default function PrivacyPage() {
           <h2 className="font-semibold text-base">Your rights</h2>
           <p className="mt-2">
             Email{" "}
-            <a href="mailto:mukherjee4004@gmail.com" className="underline">
-              mukherjee4004@gmail.com
+            <a href="mailto:hivemind@bmtai.in" className="underline">
+              hivemind@bmtai.in
             </a>{" "}
             to request a copy of your data or to have your account deleted.
           </p>

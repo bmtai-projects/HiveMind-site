@@ -13,7 +13,16 @@ export function NavBar() {
           <span aria-hidden className="text-honey">
             ⬡
           </span>
-          HiveMind
+          <span>
+            HiveMind
+            {/* Hidden below the nav's tight mobile breakpoint -- adding
+                width here is exactly what caused the real overflow bug
+                fixed earlier; this attribution is a nice-to-have, the
+                Activate button next to it is not. */}
+            <span className="ml-1.5 hidden text-xs font-normal text-foreground/50 sm:inline">
+              by bmtai
+            </span>
+          </span>
         </Link>
         <div className="flex items-center gap-4 sm:gap-6">
           {/* Two secondary links don't fit next to the CTA below ~400px --

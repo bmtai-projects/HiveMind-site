@@ -44,8 +44,8 @@ export default function RefundPolicyPage() {
           <h2 className="font-semibold text-base">How to request a refund</h2>
           <p className="mt-2">
             Email{" "}
-            <a href="mailto:mukherjee4004@gmail.com" className="underline">
-              mukherjee4004@gmail.com
+            <a href="mailto:hivemind@bmtai.in" className="underline">
+              hivemind@bmtai.in
             </a>{" "}
             with the email address on your HiveMind account. We aim to respond within 2 business
             days.

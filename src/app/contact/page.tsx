@@ -9,8 +9,8 @@ export default function ContactPage() {
 
       <div className="mt-8 rounded-lg border border-line p-6">
         <div className="text-sm text-foreground/55">Email</div>
-        <a href="mailto:mukherjee4004@gmail.com" className="text-lg underline underline-offset-2">
-          mukherjee4004@gmail.com
+        <a href="mailto:hivemind@bmtai.in" className="text-lg underline underline-offset-2">
+          hivemind@bmtai.in
         </a>
       </div>
 
