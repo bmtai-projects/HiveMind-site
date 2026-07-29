@@ -24,6 +24,10 @@ const FEATURES: Feature[] = [
     example: { kind: "command", text: "/model claude-sonnet-5" },
   },
   {
+    title: "Also in your editor",
+    body: "A VS Code extension (works in Antigravity and other VS Code-based editors too) puts the same agent in a sidebar chat: streamed replies, file edits as a real reviewable diff, and shell commands you approve before they run. Search \"HiveMind\" in the Extensions panel.",
+  },
+  {
     title: "No API key required",
     body: "Sign in, top up a balance, and run hivemind -- HiveMind holds the upstream provider keys and meters usage against your balance. Already have your own key for a provider? --api-key / --base-url still work, billed directly to that provider instead.",
     example: { kind: "command", text: 'hivemind activate -p "fix the failing test in src/paginate.rs"' },
@@ -32,6 +36,16 @@ const FEATURES: Feature[] = [
     title: "Reserve, settle, refund -- always visible",
     body: "Every request reserves a conservative estimate against your balance before it's sent, settles down to the real cost once it completes, and refunds the reservation in full if anything fails -- not just the unused part.",
     example: { kind: "output", text: "1000 in / 140 out · $0.000210 turn / $0.004180 session" },
+  },
+  {
+    title: "Real prompt caching",
+    body: "Repeated context (the system prompt, the tool manifest, earlier turns) is billed at a fraction of the price on a cache hit -- HiveMind reads whichever cache-accounting field the active provider actually reports, and sets an explicit cache breakpoint for the one provider in the catalog that needs it asked for. It shows up directly in the cost line, not just in a bill you find out about later.",
+    example: { kind: "output", text: "2000 in / 300 out, cache 90% · $0.000109 turn / $0.000353 session" },
+  },
+  {
+    title: "Faster: independent tool calls run in parallel",
+    body: "Scaffolding four files, or reading several before planning, no longer costs four sequential turns -- independent calls in one turn run concurrently. Edits to the same file are automatically serialized behind the scenes, so batching never risks one edit silently overwriting another.",
+    example: { kind: "output", text: "measured on an identical 4-file task: 8.33s sequential -> 2.60s batched" },
   },
   {
     title: "Auto-escalation off the cheap default",
@@ -44,13 +58,33 @@ const FEATURES: Feature[] = [
     example: { kind: "command", text: "/reasoning high" },
   },
   {
+    title: "A session budget cap",
+    body: "Set a hard USD ceiling for a session; HiveMind stops cleanly at the next turn boundary once it's reached, rather than an in-flight turn getting cut off mid-way or the balance draining past what you meant to spend.",
+    example: { kind: "command", text: "hivemind activate --budget 0.50" },
+  },
+  {
+    title: "Steer mid-task instead of starting over",
+    body: "Watching a long multi-step task head the wrong way used to mean killing it and losing every tool call already paid for. Press Ctrl+C to send a correction instead of aborting -- it's delivered to the model at the next safe point, and the work already done stays.",
+    example: { kind: "output", text: "↩ queued — delivered at the next step" },
+  },
+  {
+    title: "Resume where you left off",
+    body: "Every session is saved as you go, including cost spent so far -- closing the terminal, a crash, or reloading the editor doesn't throw away a conversation you already paid tokens to build up.",
+    example: { kind: "command", text: "hivemind activate --continue" },
+  },
+  {
     title: "A real toolset",
-    body: "read_file, write_file, edit_file, list_dir, search (exact-string grep), semantic_search (ranked, meaning-based lookup for when you don't know the exact name), run_shell, and todo_write for tracking multi-step work -- dispatched concurrently when a turn calls several at once.",
+    body: "read_file, write_file, edit_file, list_dir, search (exact-string grep), semantic_search (ranked, meaning-based lookup for when you don't know the exact name), project_map (a whole repo's structure and definitions in one call, for orienting before reading files one by one), run_shell, and todo_write for tracking multi-step work.",
     example: { kind: "output", text: '"where do we load a file from disk?" → reader.rs:1-4 (score 0.42) — found without knowing the function is named read_file' },
   },
   {
-    title: "Context compaction on long sessions",
-    body: "Long sessions don't hit a hard wall. Once usage crosses a threshold of the active model's context window, older turns are automatically folded into one summary -- file paths, decisions, and open tasks preserved -- instead of the session failing outright.",
+    title: "Create PDFs and spreadsheets, not just code",
+    body: "create_pdf and create_spreadsheet produce real files directly -- headings, paragraphs, tables, sheets of cells and formulas -- no Python/LibreOffice install required, and they always produce a valid file. For a PowerPoint deck or anything past that, HiveMind writes and runs a small script instead.",
+    example: { kind: "output", text: "wrote 4213 bytes to report.pdf (3 pages)" },
+  },
+  {
+    title: "Context compaction, and a guard before that",
+    body: "Long sessions don't hit a hard wall. Once usage crosses a threshold of the active model's context window, older turns are automatically folded into one summary -- file paths, decisions, and open tasks preserved. If a single message alone is too big for compaction to help, HiveMind stops with a clear message instead of sending a request the provider would just reject.",
   },
   {
     title: "Undo",
