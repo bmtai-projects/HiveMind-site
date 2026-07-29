@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512"
+     xmlns="http://www.w3.org/2000/svg">
+
+  <defs>
+    <linearGradient id="hexGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#25E6FF"/>
+      <stop offset="100%" stop-color="#8B5CF6"/>
+    </linearGradient>
+
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="512" height="512" rx="96" fill="#111827"/>
+
+  <!-- Outer Hexagon -->
+  <polygon
+    points="256,72 400,156 400,356 256,440 112,356 112,156"
+    fill="none"
+    stroke="url(#hexGradient)"
+    stroke-width="18"
+    stroke-linejoin="round"/>
+
+  <!-- Connections -->
+  <g stroke="url(#hexGradient)"
+     stroke-width="10"
+     stroke-linecap="round"
+     filter="url(#glow)">
+
+    <line x1="256" y1="256" x2="256" y2="120"/>
+    <line x1="256" y1="256" x2="370" y2="190"/>
+    <line x1="256" y1="256" x2="370" y2="322"/>
+    <line x1="256" y1="256" x2="256" y2="392"/>
+    <line x1="256" y1="256" x2="142" y2="322"/>
+    <line x1="256" y1="256" x2="142" y2="190"/>
+
+  </g>
+
+  <!-- Outer Nodes -->
+  <g fill="#25E6FF">
+    <circle cx="256" cy="120" r="12"/>
+    <circle cx="370" cy="190" r="12"/>
+    <circle cx="370" cy="322" r="12"/>
+    <circle cx="256" cy="392" r="12"/>
+    <circle cx="142" cy="322" r="12"/>
+    <circle cx="142" cy="190" r="12"/>
+  </g>
+
+  <!-- Center Node -->
+  <circle
+      cx="256"
+      cy="256"
+      r="26"
+      fill="#FFFFFF"
+      filter="url(#glow)"/>
+
+</svg>
