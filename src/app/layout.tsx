@@ -1,19 +1,20 @@
 import type { Metadata } from "next";
-import { Fraunces, IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
+import { IBM_Plex_Mono, IBM_Plex_Sans, Martian_Mono } from "next/font/google";
 
 import { Footer } from "@/components/Footer";
 import { NavBar } from "@/components/NavBar";
 
 import "./globals.css";
 
-// Display face for headlines only -- Fraunces' warmth (a nod to "hive" /
-// honey) against a technical Plex pairing, restrained to large sizes so it
-// reads as one deliberate accent rather than a whole-page editorial voice.
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
+// Display face. A monospace, deliberately: HiveMind's whole product surface
+// is a terminal and every number it prints is monospaced, so the page is set
+// in the product's own typographic language rather than the high-contrast
+// serif every other AI-tool landing page reaches for. Restricted to
+// headlines and the cost ledger -- at body size it would be unreadable.
+const martian = Martian_Mono({
+  variable: "--font-martian",
   subsets: ["latin"],
-  weight: ["500", "600"],
-  style: ["normal", "italic"],
+  weight: ["600"],
 });
 
 // Body + data faces: IBM's own technical-product type system, chosen over
@@ -39,7 +40,8 @@ export const metadata: Metadata = {
   openGraph: {
     title: "HiveMind",
     siteName: "HiveMind",
-    description: "A terminal coding agent powered by HiveMind AI. Sign in, top up, and run hivemind -- no API key of your own required.",
+    description:
+      "A terminal coding agent powered by HiveMind AI. Sign in, top up, and run hivemind -- no API key of your own required.",
     type: "website",
   },
 };
@@ -52,11 +54,11 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${fraunces.variable} ${plexSans.variable} ${plexMono.variable} h-full antialiased`}
+      className={`${martian.variable} ${plexSans.variable} ${plexMono.variable}`}
     >
-      <body className="flex min-h-full flex-col">
+      <body>
         <NavBar />
-        <main className="flex-1">{children}</main>
+        <main>{children}</main>
         <Footer />
       </body>
     </html>

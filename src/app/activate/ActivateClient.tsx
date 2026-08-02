@@ -148,18 +148,18 @@ export function ActivateClient() {
 
   if (!isFirebaseConfigured) {
     return (
-      <p className="rounded-md border border-honey/30 bg-honey/10 p-4 text-sm">
+      <p className="notice notice-warn">
         Sign-in isn&apos;t configured on this deployment yet (missing Firebase project config).
       </p>
     );
   }
 
   if (checkingAuth) {
-    return <p className="text-sm text-foreground/55">Checking sign-in...</p>;
+    return <p className="notice">Checking sign-in…</p>;
   }
 
   return (
-    <div className="space-y-8">
+    <div className="stack" style={{ gap: "2rem" }}>
       {/* GIS client library. `afterInteractive` is fine -- the sign-in
           button is never the first thing a user needs, and `onLoad` gates
           all use of `window.google` on the script actually being ready. */}
@@ -171,9 +171,9 @@ export function ActivateClient() {
       />
 
       {!session && (
-        <div className="space-y-4">
-          <div>
-            <label htmlFor="user_code" className="block text-sm font-medium">
+        <div className="stack">
+          <div className="field">
+            <label htmlFor="user_code" className="field-label">
               Code from your terminal (optional)
             </label>
             <input
@@ -181,48 +181,45 @@ export function ActivateClient() {
               value={userCode}
               onChange={(e) => setUserCode(e.target.value)}
               placeholder="XXXX-XXXX"
-              className="mt-1.5 w-full rounded-md border border-line-strong bg-transparent px-3 py-2 font-mono tracking-widest uppercase"
+              className="input input-code"
             />
           </div>
           {!isGoogleSignInConfigured ? (
-            <p className="rounded-md border border-honey/30 bg-honey/10 p-4 text-sm">
+            <p className="notice notice-warn">
               Google sign-in isn&apos;t configured on this deployment yet (missing Google client ID).
             </p>
           ) : (
             <>
               {/* GIS renders its own button into this element. */}
               <div ref={googleButtonRef} />
-              {!gsiReady && <p className="text-sm text-foreground/55">Loading Google sign-in...</p>}
+              {!gsiReady && <p className="notice">Loading Google sign-in…</p>}
             </>
           )}
-          {signInError && <p className="text-sm text-pro">{signInError}</p>}
+          {signInError && <p className="notice notice-error">{signInError}</p>}
         </div>
       )}
 
       {session && (
-        <div className="space-y-8">
-          <p className="text-sm text-foreground/70">
-            Signed in as <span className="font-medium">{session.email}</span>.
+        <div className="stack" style={{ gap: "1.5rem" }}>
+          <p style={{ fontSize: "0.9rem", color: "var(--muted)" }}>
+            Signed in as <strong style={{ color: "var(--text)" }}>{session.email}</strong>.
           </p>
 
           {userCode.trim() && (
-            <div className="rounded-md border border-line p-4">
-              {deviceStatus === "approving" && (
-                <p className="text-sm text-foreground/70">Approving...</p>
-              )}
+            <div className="card">
+              {deviceStatus === "approving" && <p className="card-body">Approving…</p>}
               {deviceStatus === "approved" && (
-                <p className="text-sm text-flash">
-                  Device approved -- you can return to your terminal, it should sign in within a
-                  few seconds.
+                <p className="card-body notice-ok">
+                  Device approved — return to your terminal, it should sign in within a few seconds.
                 </p>
               )}
               {deviceStatus === "error" && (
-                <div className="space-y-2">
-                  <p className="text-sm text-pro">{deviceError}</p>
+                <div className="stack" style={{ gap: "0.5rem" }}>
+                  <p className="card-body notice-error">{deviceError}</p>
                   <button
                     type="button"
                     onClick={() => approve(session.idToken)}
-                    className="text-sm underline underline-offset-2"
+                    className="linkbtn"
                   >
                     Try again
                   </button>
@@ -231,10 +228,11 @@ export function ActivateClient() {
             </div>
           )}
 
-          <div className="space-y-4 rounded-md border border-line p-4">
-            <h2 className="font-medium">Add funds</h2>
-            <div>
-              <label htmlFor="phone" className="block text-sm font-medium">
+          <div className="card">
+            <h2 className="card-title">Add funds</h2>
+
+            <div className="field" style={{ marginTop: "1.25rem" }}>
+              <label htmlFor="phone" className="field-label">
                 Phone number
               </label>
               <input
@@ -242,29 +240,27 @@ export function ActivateClient() {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="Required by our payment processor"
-                className="mt-1.5 w-full rounded-md border border-line-strong bg-transparent px-3 py-2"
+                className="input"
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium">Amount</label>
-              <div className="mt-1.5 flex flex-wrap gap-2">
+
+            <div className="field">
+              <span className="field-label">Amount</span>
+              <div className="preset-row">
                 {PRESET_TOPUPS_INR.map((preset) => (
                   <button
                     key={preset}
                     type="button"
                     onClick={() => selectAmount(preset)}
-                    className={`rounded-md border px-3 py-1.5 font-mono text-sm font-medium ${
-                      amount === preset
-                        ? "border-honey bg-honey/10 text-honey-strong"
-                        : "border-line-strong hover:bg-foreground/5"
-                    }`}
+                    aria-pressed={amount === preset}
+                    className="preset"
                   >
                     ₹{preset}
                   </button>
                 ))}
               </div>
 
-              <div className="mt-4 flex items-center gap-4">
+              <div className="amount-row">
                 <input
                   type="range"
                   min={MIN_TOPUP_INR}
@@ -272,11 +268,11 @@ export function ActivateClient() {
                   step={10}
                   value={amount}
                   onChange={(e) => selectAmount(Number(e.target.value))}
-                  className="h-2 flex-1 cursor-pointer accent-honey"
+                  className="range"
                   aria-label="Top-up amount in rupees"
                 />
-                <div className="flex items-center gap-1 rounded-md border border-line-strong px-2 py-1.5">
-                  <span className="text-sm text-foreground/55">₹</span>
+                <div className="amount-box">
+                  <span>₹</span>
                   <input
                     type="number"
                     min={MIN_TOPUP_INR}
@@ -284,11 +280,11 @@ export function ActivateClient() {
                     value={amountDraft}
                     onChange={(e) => setAmountDraft(e.target.value)}
                     onBlur={() => selectAmount(clampTopup(Number(amountDraft)))}
-                    className="w-20 bg-transparent text-right font-medium outline-none"
+                    aria-label="Top-up amount in rupees"
                   />
                 </div>
               </div>
-              <p className="mt-1.5 text-xs text-foreground/50">
+              <p className="hint">
                 Any amount from ₹{MIN_TOPUP_INR} to ₹{MAX_TOPUP_INR.toLocaleString("en-IN")}
               </p>
             </div>
@@ -297,11 +293,14 @@ export function ActivateClient() {
               type="button"
               onClick={() => handleTopup(amount)}
               disabled={checkoutStatus === "creating" || phone.trim().length < 6}
-              className="w-full rounded-md bg-honey px-5 py-2.5 font-medium text-ink transition-colors hover:bg-honey-strong disabled:opacity-50"
+              className="btn btn-primary"
+              style={{ width: "100%", marginTop: "1.5rem" }}
             >
-              {checkoutStatus === "creating" ? "Starting checkout..." : `Top up ₹${amount}`}
+              {checkoutStatus === "creating" ? "Starting checkout…" : `Top up ₹${amount}`}
             </button>
-            {checkoutError && <p className="text-sm text-pro">{checkoutError}</p>}
+            {checkoutError && (
+              <p className="card-body notice-error">{checkoutError}</p>
+            )}
           </div>
         </div>
       )}

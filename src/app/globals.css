@@ -1,78 +1,124 @@
-@import "tailwindcss";
+/* ============================================================================
+   HiveMind — "instrument, not brochure"
 
-/*
-  Token system for HiveMind's identity: an "instrument panel" reading of a
-  cost-metered terminal agent, not a generic SaaS palette.
+   Direction: HiveMind's entire product surface is a terminal, and every
+   number it shows you is monospaced. So the page speaks the product's own
+   typographic language: the DISPLAY face is a mono (Martian Mono), not the
+   high-contrast serif that every other AI-tool landing page reaches for.
+   Body stays IBM Plex Sans, data stays IBM Plex Mono — three faces, three
+   distinct jobs.
 
-  - ink / ink-raised: dark-mode canvas and panel, a blue-black (not flat
-    #000) so the terminal signature element doesn't compete with true black.
-  - paper: light-mode canvas, a warm off-white (not stark #fff) that keeps
-    the honey accent from feeling cold.
-  - honey: the one brand accent (hive/honey), spent narrowly -- primary CTA,
-    the accent rule, the signature moment. Not wallpapered everywhere.
-  - flash / pro: not decorative -- these are the two model-tier colors used
-    consistently anywhere a tier is shown (hero demo, pricing, badges), so
-    color carries real meaning instead of being chosen per-component.
-*/
+   Two accents, each carrying meaning rather than decoration:
+     cyan  = the brand and anything interactive (taken from the real VS Code
+             extension icon, so the site and the extension share an identity)
+     amber = money — the CTA, balances, the cost ledger
+   Violet exists only inside the logo mark, never in UI chrome.
+
+   Dark only. No light theme: the product is a terminal, and a metered
+   readout wants a dark instrument panel, not paper.
+   ============================================================================ */
+
+/* ---------------------------------------------------------------- tokens -- */
+
 :root {
-  --ink: #0e1116;
-  --ink-raised: #171b22;
-  --paper: #f7f3ea;
-  --paper-raised: #ffffff;
-  --honey: #c9862a;
-  --honey-strong: #a86c1e;
-  --flash: #2c8a81;
-  --pro: #c04a32;
+  /* Surfaces. The canvas is an indigo-black with a real hue rather than a
+     neutral near-black, so cyan reads as belonging to it instead of
+     floating on top. `sunk` is *darker* than the canvas — code wells and
+     inputs recede rather than lifting, which is how a physical panel
+     behaves. */
+  --void: #0a0d18;
+  --panel: #111527;
+  --sunk: #070a12;
+  --edge: #212840;
+  --edge-bright: #333c5c;
 
-  --background: var(--paper);
-  --background-raised: var(--paper-raised);
-  --foreground: var(--ink);
-  --line: rgb(14 17 22 / 12%);
-  --line-strong: rgb(14 17 22 / 22%);
+  --text: #e4e8f4;
+  --muted: #8892ae;
+  --faint: #5c6484;
+
+  --cyan: #4cd8f0;
+  --cyan-dim: #2ba8c4;
+  --violet: #8b5cf6;
+  --amber: #f0b849;
+  --amber-dim: #c79232;
+  --ember: #e1573d;
+
+  --font-display: var(--font-martian), ui-monospace, monospace;
+  --font-body: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-data: var(--font-plex-mono), ui-monospace, monospace;
+
+  /* One spacing scale, used everywhere. Section rhythm is a single token so
+     vertical spacing can't drift page to page. */
+  --gap-section: 5rem;
+  --radius: 10px;
+  --radius-sm: 6px;
+  --shell: 62rem;
+  --measure: 44rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --honey: #e8a93b;
-    --honey-strong: #f2bd5c;
-    --flash: #4fb8ae;
-    --pro: #e1573d;
+/* ------------------------------------------------------------- baseline -- */
 
-    --background: var(--ink);
-    --background-raised: var(--ink-raised);
-    --foreground: #f2efe6;
-    --line: rgb(242 239 230 / 12%);
-    --line-strong: rgb(242 239 230 / 24%);
-  }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-background-raised: var(--background-raised);
-  --color-foreground: var(--foreground);
-  --color-line: var(--line);
-  --color-line-strong: var(--line-strong);
-  --color-honey: var(--honey);
-  --color-honey-strong: var(--honey-strong);
-  --color-flash: var(--flash);
-  --color-pro: var(--pro);
-  /* Always dark, in both themes -- text placed on the honey accent (which
-     stays a mid-warm tone in dark mode too) needs guaranteed contrast, not
-     whatever --foreground currently is. */
-  --color-ink: var(--ink);
+* {
+  margin: 0;
+}
 
-  --font-display: var(--font-fraunces);
-  --font-sans: var(--font-plex-sans);
-  --font-mono: var(--font-plex-mono);
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  /* Anchored docs headings must clear the sticky nav. */
+  scroll-padding-top: 6rem;
+  color-scheme: dark;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--void);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+main {
+  flex: 1;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+}
+
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+  border-radius: 3px;
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
   *,
   *::before,
   *::after {
@@ -82,8 +128,924 @@ body {
   }
 }
 
-@keyframes blink {
-  50% {
-    opacity: 0;
+/* ----------------------------------------------------------- typography -- */
+
+.display {
+  font-family: var(--font-display);
+  font-weight: 600;
+  /* Mono at display size needs aggressive negative tracking or the word
+     spacing reads as gaps rather than words. */
+  letter-spacing: -0.045em;
+  line-height: 1.08;
+}
+
+h1.display {
+  font-size: clamp(2.1rem, 6.5vw, 3.4rem);
+}
+
+h2.display {
+  font-size: clamp(1.5rem, 3.5vw, 1.9rem);
+}
+
+h3.display {
+  font-size: 1.05rem;
+  letter-spacing: -0.03em;
+}
+
+/* Small caps label — the panel-marking device used throughout for eyebrows,
+   field labels, and table headers. One device, used consistently. */
+.label {
+  font-family: var(--font-data);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.label-cyan {
+  color: var(--cyan);
+}
+
+.lede {
+  font-size: 1.125rem;
+  line-height: 1.65;
+  color: var(--muted);
+  max-width: var(--measure);
+}
+
+.prose p {
+  color: var(--muted);
+  margin-top: 0.85rem;
+  max-width: var(--measure);
+}
+
+.prose p:first-child {
+  margin-top: 0;
+}
+
+.prose strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.link {
+  color: var(--cyan);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  text-decoration-color: color-mix(in srgb, var(--cyan) 40%, transparent);
+  transition: text-decoration-color 0.15s;
+}
+
+.link:hover {
+  text-decoration-color: var(--cyan);
+}
+
+/* --------------------------------------------------------------- layout -- */
+
+.shell {
+  width: 100%;
+  max-width: var(--shell);
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+}
+
+.shell-narrow {
+  max-width: 52rem;
+}
+
+.page {
+  padding-block: 4rem 6rem;
+}
+
+.section {
+  margin-top: var(--gap-section);
+}
+
+.stack > * + * {
+  margin-top: 1rem;
+}
+
+/* --------------------------------------------------------------- navbar -- */
+
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  border-bottom: 1px solid var(--edge);
+  background: color-mix(in srgb, var(--void) 88%, transparent);
+  backdrop-filter: blur(12px);
+}
+
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block: 0.9rem;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+}
+
+.brand-mark {
+  width: 22px;
+  height: 22px;
+  flex: none;
+}
+
+.brand-by {
+  font-family: var(--font-data);
+  font-size: 0.7rem;
+  font-weight: 400;
+  color: var(--faint);
+  margin-left: 0.4rem;
+}
+
+.nav-links {
+  display: none;
+  align-items: center;
+  gap: 1.75rem;
+  font-size: 0.9rem;
+}
+
+.nav-links a {
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.nav-links a:hover {
+  color: var(--text);
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+@media (min-width: 40rem) {
+  .nav-links {
+    display: flex;
   }
+  .brand-by {
+    display: inline;
+  }
+}
+
+/* -------------------------------------------------------------- buttons -- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.25rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  font-size: 0.925rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color 0.15s,
+    border-color 0.15s,
+    color 0.15s;
+}
+
+/* Amber = money. The primary action always spends or unlocks spending. */
+.btn-primary {
+  background: var(--amber);
+  color: #17130a;
+}
+
+.btn-primary:hover {
+  background: #ffcd63;
+}
+
+.btn-ghost {
+  border-color: var(--edge-bright);
+  color: var(--text);
+}
+
+.btn-ghost:hover {
+  background: var(--panel);
+  border-color: var(--faint);
+}
+
+.btn-sm {
+  padding: 0.45rem 0.9rem;
+  font-size: 0.85rem;
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+/* ---------------------------------------------------------------- cards -- */
+
+.card {
+  border: 1px solid var(--edge);
+  border-radius: var(--radius);
+  background: var(--panel);
+  padding: 1.5rem;
+}
+
+.card-title {
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+}
+
+.card-body {
+  margin-top: 0.6rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.grid-3 {
+  display: grid;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+@media (min-width: 48rem) {
+  .grid-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* --------------------------------------------- install panel (the hero) -- */
+
+.install {
+  margin-top: 2.5rem;
+  border: 1px solid var(--edge);
+  border-radius: var(--radius);
+  background: var(--panel);
+  overflow: hidden;
+  max-width: var(--measure);
+}
+
+.install-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.55rem 0.55rem 0.55rem 1rem;
+  border-bottom: 1px solid var(--edge);
+}
+
+/* Segmented OS switch — reads as a physical instrument toggle, not tabs. */
+.seg {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.2rem;
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-sm);
+  background: var(--sunk);
+}
+
+.seg button {
+  padding: 0.3rem 0.7rem;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--font-data);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
+}
+
+.seg button:hover {
+  color: var(--text);
+}
+
+.seg button[aria-selected="true"] {
+  background: var(--edge);
+  color: var(--text);
+}
+
+.install-body {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: var(--sunk);
+}
+
+/* The command must be fully readable — it wraps rather than scrolling, so
+   nothing is hidden off-edge on any screen width. `anywhere` (not
+   break-word) is what actually breaks a long unbroken URL. */
+.install-cmd {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-family: var(--font-data);
+  font-size: 0.82rem;
+  line-height: 1.75;
+  color: var(--text);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.install-cmd .sigil {
+  color: var(--cyan);
+  user-select: none;
+}
+
+.copy {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--edge-bright);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  color: var(--muted);
+  font-family: var(--font-data);
+  font-size: 0.72rem;
+  cursor: pointer;
+  transition:
+    color 0.15s,
+    border-color 0.15s;
+}
+
+.copy:hover {
+  color: var(--text);
+  border-color: var(--faint);
+}
+
+.copy[data-copied="true"] {
+  color: var(--cyan);
+  border-color: var(--cyan-dim);
+}
+
+.copy svg {
+  width: 13px;
+  height: 13px;
+}
+
+.install-foot {
+  padding: 0.6rem 1rem;
+  border-top: 1px solid var(--edge);
+  font-family: var(--font-data);
+  font-size: 0.72rem;
+  color: var(--faint);
+}
+
+/* ----------------------------------------- the signature: cost ledger -- */
+
+/*
+  The product's core mechanic as a piece of typography: one number in three
+  states. "You pay" is set large and amber; what's held and returned is set
+  small and muted. The size difference IS the argument — you are charged a
+  fraction of what was held, and the rest comes back.
+*/
+.ledger {
+  margin-top: 4rem;
+  border-top: 1px solid var(--edge);
+  border-bottom: 1px solid var(--edge);
+  padding-block: 2.5rem;
+}
+
+/*
+  `align-items: start` is load-bearing, not incidental: the paid cell is
+  roughly twice the height of its neighbours, so aligning to the end would
+  push its label well above the other two and read as a layout bug rather
+  than a hierarchy. Aligning to the top puts all three labels on one line
+  and lets only the numbers differ in size -- which is the entire point.
+*/
+.ledger-row {
+  display: grid;
+  gap: 1.75rem;
+  align-items: start;
+  grid-template-columns: 1fr;
+  margin-top: 1.75rem;
+}
+
+@media (min-width: 46rem) {
+  .ledger-row {
+    grid-template-columns: auto auto auto;
+    justify-content: start;
+    gap: 3rem;
+  }
+}
+
+.ledger-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.ledger-num {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.05em;
+  font-variant-numeric: tabular-nums;
+  color: var(--faint);
+  font-size: 1.35rem;
+}
+
+/* The one number that matters, and the only place amber appears at size. */
+.ledger-cell--paid .ledger-num {
+  color: var(--amber);
+  font-size: clamp(2.2rem, 7vw, 3.1rem);
+}
+
+.ledger-cell--paid .label {
+  color: var(--amber-dim);
+}
+
+.ledger-note {
+  margin-top: 1.75rem;
+  font-size: 0.875rem;
+  color: var(--muted);
+  max-width: var(--measure);
+}
+
+/* ------------------------------------------------------- numbered steps -- */
+
+/*
+  Numbering is used here because install → activate → top up is a genuine
+  ordered sequence: you cannot do the third before the first. It is not
+  used anywhere else on the site where the content is a set rather than a
+  sequence.
+*/
+.step-num {
+  font-family: var(--font-data);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--cyan);
+}
+
+.step-code {
+  margin-top: 1rem;
+  padding: 0.7rem 0.85rem;
+  border-radius: var(--radius-sm);
+  background: var(--sunk);
+  border: 1px solid var(--edge);
+  font-family: var(--font-data);
+  font-size: 0.78rem;
+  color: var(--text);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.step-code .sigil {
+  color: var(--cyan);
+  user-select: none;
+}
+
+/* ---------------------------------------------------------- docs layout -- */
+
+.docs {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3rem;
+  padding-block: 3rem 6rem;
+  align-items: start;
+}
+
+@media (min-width: 60rem) {
+  .docs {
+    grid-template-columns: 15rem minmax(0, 1fr);
+    gap: 4rem;
+  }
+}
+
+.docs-nav {
+  position: static;
+  border-bottom: 1px solid var(--edge);
+  padding-bottom: 1.5rem;
+}
+
+@media (min-width: 60rem) {
+  .docs-nav {
+    position: sticky;
+    top: 5.5rem;
+    max-height: calc(100dvh - 7rem);
+    overflow-y: auto;
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+}
+
+.docs-nav-group + .docs-nav-group {
+  margin-top: 1.5rem;
+}
+
+.docs-nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.7rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  /* A single hairline rail ties the whole list together and reads as the
+     spine of the document, rather than each item floating alone. */
+  border-left: 1px solid var(--edge);
+}
+
+.docs-nav-list a {
+  display: block;
+  padding: 0.32rem 0 0.32rem 0.85rem;
+  margin-left: -1px;
+  border-left: 1px solid transparent;
+  font-size: 0.875rem;
+  color: var(--muted);
+  text-decoration: none;
+  transition:
+    color 0.15s,
+    border-color 0.15s;
+}
+
+.docs-nav-list a:hover {
+  color: var(--text);
+  border-left-color: var(--edge-bright);
+}
+
+/*
+  Marks your place with no JavaScript. `:target` alone can only style the
+  section itself, which is the part you're already looking at -- the useful
+  signal is in the sidebar, which sits *before* the sections in the DOM and
+  so can't be reached by a sibling combinator. `:has()` on the shared
+  ancestor is what makes that possible, one rule per topic.
+
+  This tracks clicks, not scroll position: a genuine scroll-spy needs an
+  IntersectionObserver, and a whole JS dependency to move a 1px rail was
+  not worth it here.
+*/
+.docs-section:target .docs-h2 {
+  color: var(--cyan);
+}
+
+.docs:has(#getting-started:target) a[href="#getting-started"],
+.docs:has(#models:target) a[href="#models"],
+.docs:has(#cost:target) a[href="#cost"],
+.docs:has(#tools:target) a[href="#tools"],
+.docs:has(#sessions:target) a[href="#sessions"],
+.docs:has(#configuration:target) a[href="#configuration"] {
+  color: var(--cyan);
+  border-left-color: var(--cyan);
+}
+
+.docs-content > .docs-section:first-child {
+  margin-top: 0;
+}
+
+.docs-section {
+  margin-top: 4rem;
+}
+
+.docs-h2 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  font-size: 1.45rem;
+  scroll-margin-top: 6rem;
+  transition: color 0.2s;
+}
+
+.docs-section-note {
+  margin-top: 0.6rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+  max-width: var(--measure);
+}
+
+.docs-features {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.feature {
+  border: 1px solid var(--edge);
+  border-radius: var(--radius);
+  background: var(--panel);
+  padding: 1.25rem 1.4rem;
+}
+
+.feature-title {
+  font-weight: 600;
+  font-size: 0.975rem;
+  letter-spacing: -0.01em;
+}
+
+.feature-body {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.feature-example {
+  margin-top: 0.9rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: var(--radius-sm);
+  background: var(--sunk);
+  border: 1px solid var(--edge);
+  font-family: var(--font-data);
+  font-size: 0.775rem;
+  line-height: 1.7;
+  color: var(--muted);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.feature-example .sigil {
+  color: var(--cyan);
+  user-select: none;
+}
+
+/* ------------------------------------------------------------- pricing -- */
+
+.price-hero {
+  margin-top: 2.5rem;
+  border: 1px solid var(--edge);
+  border-radius: var(--radius);
+  background: var(--panel);
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+}
+
+.price-range {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  font-size: clamp(1.8rem, 6vw, 2.6rem);
+  color: var(--amber);
+}
+
+.price-chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+}
+
+.chip {
+  padding: 0.3rem 0.75rem;
+  border: 1px solid var(--edge-bright);
+  border-radius: 999px;
+  font-family: var(--font-data);
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.tier {
+  font-family: var(--font-data);
+  font-size: 0.9em;
+}
+
+.tier-flash {
+  color: var(--cyan);
+}
+
+.tier-pro {
+  color: var(--ember);
+}
+
+/* -------------------------------------------------------------- activate -- */
+
+.field {
+  display: block;
+}
+
+.field + .field {
+  margin-top: 1.25rem;
+}
+
+.field-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.45rem;
+}
+
+.input {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--edge-bright);
+  border-radius: var(--radius-sm);
+  background: var(--sunk);
+  color: var(--text);
+  transition: border-color 0.15s;
+}
+
+.input::placeholder {
+  color: var(--faint);
+}
+
+.input:focus {
+  border-color: var(--cyan-dim);
+}
+
+.input-code {
+  font-family: var(--font-data);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.preset-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.preset {
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--edge-bright);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--font-data);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    color 0.15s,
+    background-color 0.15s;
+}
+
+.preset:hover {
+  color: var(--text);
+  border-color: var(--faint);
+}
+
+.preset[aria-pressed="true"] {
+  border-color: var(--amber);
+  background: color-mix(in srgb, var(--amber) 12%, transparent);
+  color: var(--amber);
+}
+
+.amount-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.range {
+  flex: 1;
+  min-width: 0;
+  accent-color: var(--amber);
+  cursor: pointer;
+}
+
+.amount-box {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--edge-bright);
+  border-radius: var(--radius-sm);
+  background: var(--sunk);
+}
+
+.amount-box span {
+  color: var(--faint);
+  font-size: 0.9rem;
+}
+
+.amount-box input {
+  width: 4.5rem;
+  border: none;
+  background: transparent;
+  text-align: right;
+  font-family: var(--font-data);
+  font-weight: 500;
+  outline: none;
+}
+
+.hint {
+  margin-top: 0.5rem;
+  font-size: 0.78rem;
+  color: var(--faint);
+}
+
+/* Status messages. Each states what happened and what to do — never a bare
+   mood colour with no direction. */
+.notice {
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--edge);
+  background: var(--panel);
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.notice-warn {
+  border-color: color-mix(in srgb, var(--amber) 40%, transparent);
+  background: color-mix(in srgb, var(--amber) 8%, transparent);
+  color: var(--text);
+}
+
+.notice-error {
+  color: var(--ember);
+}
+
+.notice-ok {
+  color: var(--cyan);
+}
+
+.linkbtn {
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--cyan);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+/* --------------------------------------------------------------- footer -- */
+
+.footer {
+  margin-top: auto;
+  border-top: 1px solid var(--edge);
+}
+
+.footer-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-block: 2rem;
+  font-family: var(--font-data);
+  font-size: 0.75rem;
+  color: var(--faint);
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+}
+
+.footer-links a {
+  color: var(--faint);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.footer-links a:hover {
+  color: var(--text);
+}
+
+@media (min-width: 46rem) {
+  .footer-inner {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+/* ---------------------------------------------------------- legal pages -- */
+
+.legal h2 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  font-size: 1.15rem;
+  margin-top: 2.5rem;
+}
+
+.legal p,
+.legal li {
+  color: var(--muted);
+  margin-top: 0.8rem;
+  max-width: var(--measure);
+}
+
+.legal ul {
+  padding-left: 1.1rem;
+  margin-top: 0.5rem;
+}
+
+.legal li {
+  margin-top: 0.4rem;
 }

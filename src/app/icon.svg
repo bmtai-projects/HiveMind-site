@@ -1,64 +1,26 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="512" height="512" viewBox="0 0 512 512"
-     xmlns="http://www.w3.org/2000/svg">
-
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!--
+    Compressed favicon build of the VS Code extension icon (media/icon.png).
+    Same mark, stripped for small sizes: the Gaussian glow filter and the six
+    outer node dots are dropped (both turn to mush under ~24px and the filter
+    costs a raster pass for nothing), and the remaining strokes are thickened
+    relative to the original so the hexagon still reads at 16px in a tab.
+  -->
   <defs>
-    <linearGradient id="hexGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#25E6FF"/>
-      <stop offset="100%" stop-color="#8B5CF6"/>
+    <linearGradient id="hm" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#25E6FF" />
+      <stop offset="1" stop-color="#8B5CF6" />
     </linearGradient>
-
-    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur stdDeviation="6" result="blur"/>
-      <feMerge>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
   </defs>
 
-  <!-- Background -->
-  <rect width="512" height="512" rx="96" fill="#111827"/>
+  <rect width="64" height="64" rx="13" fill="#111827" />
 
-  <!-- Outer Hexagon -->
-  <polygon
-    points="256,72 400,156 400,356 256,440 112,356 112,156"
-    fill="none"
-    stroke="url(#hexGradient)"
-    stroke-width="18"
-    stroke-linejoin="round"/>
-
-  <!-- Connections -->
-  <g stroke="url(#hexGradient)"
-     stroke-width="10"
-     stroke-linecap="round"
-     filter="url(#glow)">
-
-    <line x1="256" y1="256" x2="256" y2="120"/>
-    <line x1="256" y1="256" x2="370" y2="190"/>
-    <line x1="256" y1="256" x2="370" y2="322"/>
-    <line x1="256" y1="256" x2="256" y2="392"/>
-    <line x1="256" y1="256" x2="142" y2="322"/>
-    <line x1="256" y1="256" x2="142" y2="190"/>
-
+  <g stroke="url(#hm)" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M32 9 50 19.5v25L32 55 14 44.5v-25z" stroke-width="3.2" />
+    <g stroke-width="2.1" opacity=".85">
+      <path d="M32 32V16M32 32l13-7.5M32 32l13 7.5M32 32v16M32 32l-13 7.5M32 32l-13-7.5" />
+    </g>
   </g>
 
-  <!-- Outer Nodes -->
-  <g fill="#25E6FF">
-    <circle cx="256" cy="120" r="12"/>
-    <circle cx="370" cy="190" r="12"/>
-    <circle cx="370" cy="322" r="12"/>
-    <circle cx="256" cy="392" r="12"/>
-    <circle cx="142" cy="322" r="12"/>
-    <circle cx="142" cy="190" r="12"/>
-  </g>
-
-  <!-- Center Node -->
-  <circle
-      cx="256"
-      cy="256"
-      r="26"
-      fill="#FFFFFF"
-      filter="url(#glow)"/>
-
+  <circle cx="32" cy="32" r="4.6" fill="#fff" />
 </svg>

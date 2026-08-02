@@ -6,44 +6,54 @@ const links = [
   { href: "/contact", label: "Contact" },
 ];
 
+// Same geometry as the favicon (src/app/icon.svg) and the VS Code
+// extension's icon, minus the dark tile -- it sits on the page background
+// here rather than needing its own. Violet appears only in this mark; it is
+// never used in UI chrome.
+function Mark() {
+  return (
+    <svg className="brand-mark" viewBox="0 0 64 64" aria-hidden>
+      <defs>
+        <linearGradient id="nav-mark" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#25E6FF" />
+          <stop offset="1" stopColor="#8B5CF6" />
+        </linearGradient>
+      </defs>
+      <g stroke="url(#nav-mark)" fill="none" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M32 9 50 19.5v25L32 55 14 44.5v-25z" strokeWidth="3.6" />
+        <g strokeWidth="2.4" opacity=".8">
+          <path d="M32 32V16M32 32l13-7.5M32 32l13 7.5M32 32v16M32 32l-13 7.5M32 32l-13-7.5" />
+        </g>
+      </g>
+      <circle cx="32" cy="32" r="5" fill="#fff" />
+    </svg>
+  );
+}
+
 export function NavBar() {
   return (
-    <header className="border-b border-line">
-      <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-        <Link href="/" className="flex items-center gap-2 font-medium tracking-tight">
-          <span aria-hidden className="text-honey">
-            ⬡
-          </span>
+    <header className="nav">
+      <div className="shell nav-inner">
+        <Link href="/" className="brand">
+          <Mark />
           <span>
             HiveMind
-            {/* Hidden below the nav's tight mobile breakpoint -- adding
-                width here is exactly what caused the real overflow bug
-                fixed earlier; this attribution is a nice-to-have, the
-                Activate button next to it is not. */}
-            <span className="ml-1.5 hidden text-xs font-normal text-foreground/50 sm:inline">
-              by bmtai
-            </span>
+            <span className="brand-by">by bmtai</span>
           </span>
         </Link>
-        <div className="flex items-center gap-4 sm:gap-6">
+
+        <div className="nav-right">
           {/* Two secondary links don't fit next to the CTA below ~400px --
               dropped rather than wrapped or hamburgered; both are one tap
               away in the footer on mobile. */}
-          <nav className="hidden items-center gap-6 text-sm sm:flex">
+          <nav className="nav-links">
             {links.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="text-foreground/70 transition-colors hover:text-foreground"
-              >
+              <Link key={link.href} href={link.href}>
                 {link.label}
               </Link>
             ))}
           </nav>
-          <Link
-            href="/activate"
-            className="rounded-md bg-honey px-3 py-1.5 text-sm font-medium text-ink transition-colors hover:bg-honey-strong"
-          >
+          <Link href="/activate" className="btn btn-primary btn-sm">
             Activate
           </Link>
         </div>

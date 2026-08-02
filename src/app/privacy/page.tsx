@@ -1,13 +1,13 @@
 export default function PrivacyPage() {
   return (
-    <div className="mx-auto max-w-3xl px-6 py-16">
-      <h1 className="font-display text-3xl font-semibold tracking-tight">Privacy Policy</h1>
-      <p className="mt-2 text-sm opacity-60">Last updated: July 2026</p>
+    <div className="shell shell-narrow page legal">
+      <h1 className="display">Privacy Policy</h1>
+      <p className="label" style={{ marginTop: "1rem" }}>Last updated: July 2026</p>
 
-      <div className="mt-8 space-y-6 text-sm leading-7 opacity-90">
+      <div style={{ marginTop: "2rem" }}>
         <section>
-          <h2 className="font-semibold text-base">What we collect</h2>
-          <ul className="mt-2 list-disc space-y-1 pl-5">
+          <h2>What we collect</h2>
+          <ul>
             <li>Your email address, via Google sign-in, to identify your account.</li>
             <li>
               A record of API usage (timestamps, token counts, cost) needed to meter your balance
@@ -22,16 +22,16 @@ export default function PrivacyPage() {
         </section>
 
         <section>
-          <h2 className="font-semibold text-base">How we use it</h2>
-          <p className="mt-2">
+          <h2>How we use it</h2>
+          <p>
             To authenticate you, meter and bill usage against your balance, and provide support if
             you contact us. We don&apos;t sell your data or use it for advertising.
           </p>
         </section>
 
         <section>
-          <h2 className="font-semibold text-base">Who we share it with</h2>
-          <ul className="mt-2 list-disc space-y-1 pl-5">
+          <h2>Who we share it with</h2>
+          <ul>
             <li>Google Firebase -- authentication and account storage.</li>
             <li>Cashfree -- payment processing.</li>
             <li>
@@ -42,8 +42,8 @@ export default function PrivacyPage() {
         </section>
 
         <section>
-          <h2 className="font-semibold text-base">Retention</h2>
-          <p className="mt-2">
+          <h2>Retention</h2>
+          <p>
             Usage and billing records are kept for as long as your account is active, and for a
             reasonable period after for accounting purposes. Delete your account by emailing us
             and we&apos;ll remove what we&apos;re not legally required to keep.
@@ -51,10 +51,10 @@ export default function PrivacyPage() {
         </section>
 
         <section>
-          <h2 className="font-semibold text-base">Your rights</h2>
-          <p className="mt-2">
+          <h2>Your rights</h2>
+          <p>
             Email{" "}
-            <a href="mailto:hivemind@bmtai.in" className="underline">
+            <a href="mailto:hivemind@bmtai.in" className="link">
               hivemind@bmtai.in
             </a>{" "}
             to request a copy of your data or to have your account deleted.

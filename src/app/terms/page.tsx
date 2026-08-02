@@ -1,13 +1,13 @@
 export default function TermsPage() {
   return (
-    <div className="mx-auto max-w-3xl px-6 py-16">
-      <h1 className="font-display text-3xl font-semibold tracking-tight">Terms of Service</h1>
-      <p className="mt-2 text-sm opacity-60">Last updated: July 2026</p>
+    <div className="shell shell-narrow page legal">
+      <h1 className="display">Terms of Service</h1>
+      <p className="label" style={{ marginTop: "1rem" }}>Last updated: July 2026</p>
 
-      <div className="mt-8 space-y-6 text-sm leading-7 opacity-90">
+      <div style={{ marginTop: "2rem" }}>
         <section>
-          <h2 className="font-semibold text-base">1. The service</h2>
-          <p className="mt-2">
+          <h2>1. The service</h2>
+          <p>
             HiveMind provides a terminal-based coding agent (the &quot;CLI&quot;) and, optionally,
             a hosted service that authenticates your account and meters usage against a prepaid
             balance so you don&apos;t need your own API key with our upstream model provider. The
@@ -16,8 +16,8 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="font-semibold text-base">2. Accounts</h2>
-          <p className="mt-2">
+          <h2>2. Accounts</h2>
+          <p>
             You need an account to use hosted mode. You&apos;re responsible for keeping your login
             credentials and CLI access token secure, and for any usage that occurs through your
             account. Tell us immediately if you suspect unauthorized access.
@@ -25,15 +25,15 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="font-semibold text-base">3. Billing</h2>
-          <p className="mt-2">
+          <h2>3. Billing</h2>
+          <p>
             Hosted mode is pay-as-you-go: you purchase a prepaid balance, and requests are metered
             against it at cost. There is no subscription or recurring charge. See our{" "}
-            <a href="/pricing" className="underline">
+            <a href="/pricing" className="link">
               Pricing
             </a>{" "}
             and{" "}
-            <a href="/refund-policy" className="underline">
+            <a href="/refund-policy" className="link">
               Refund Policy
             </a>{" "}
             pages for details.
@@ -41,8 +41,8 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="font-semibold text-base">4. Acceptable use</h2>
-          <p className="mt-2">
+          <h2>4. Acceptable use</h2>
+          <p>
             Don&apos;t use HiveMind to generate content that&apos;s illegal, infringing, or
             intended to cause harm; don&apos;t attempt to circumvent metering or resell access to
             the hosted service; don&apos;t attempt to extract or abuse the underlying credentials
@@ -51,8 +51,8 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="font-semibold text-base">5. No warranty</h2>
-          <p className="mt-2">
+          <h2>5. No warranty</h2>
+          <p>
             The service is provided &quot;as is.&quot; Model output can be wrong -- review
             anything the agent generates or executes before relying on it, especially shell
             commands run against your own files.
@@ -60,8 +60,8 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="font-semibold text-base">6. Limitation of liability</h2>
-          <p className="mt-2">
+          <h2>6. Limitation of liability</h2>
+          <p>
             To the maximum extent permitted by law, HiveMind is not liable for indirect,
             incidental, or consequential damages arising from use of the service. Our total
             liability for any claim is limited to the amount you paid us in the 3 months before
@@ -70,18 +70,18 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="font-semibold text-base">7. Changes</h2>
-          <p className="mt-2">
+          <h2>7. Changes</h2>
+          <p>
             We may update these terms as the service evolves. Material changes will be reflected
             here with an updated date.
           </p>
         </section>
 
         <section>
-          <h2 className="font-semibold text-base">8. Contact</h2>
-          <p className="mt-2">
+          <h2>8. Contact</h2>
+          <p>
             Questions about these terms:{" "}
-            <a href="mailto:hivemind@bmtai.in" className="underline">
+            <a href="mailto:hivemind@bmtai.in" className="link">
               hivemind@bmtai.in
             </a>
             .

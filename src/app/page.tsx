@@ -1,156 +1,120 @@
 import Link from "next/link";
 
-import { TerminalDemo } from "@/components/TerminalDemo";
+import { InstallPanel } from "@/components/InstallPanel";
 
-type CodeVariant = { label: string; code: string };
-type Step = { title: string; body: string; code: string | CodeVariant[] };
-
-const steps: Step[] = [
+// install -> activate -> top up is a genuine ordered sequence (you cannot do
+// the third before the first), which is the only reason these carry numbers.
+// Nothing else on the site is numbered.
+const steps = [
   {
     title: "Install",
-    body: "Download the hivemind binary for your platform and install it with one command -- no source access needed.",
-    code: [
-      {
-        label: "macOS / Linux",
-        code: "curl -fsSL https://raw.githubusercontent.com/BibhabenduMukherjee/HiveMind-releases/main/install.sh | bash",
-      },
-      {
-        label: "Windows (PowerShell)",
-        code: "irm https://raw.githubusercontent.com/BibhabenduMukherjee/HiveMind-releases/main/install.ps1 | iex",
-      },
-    ],
+    body: "One command, no source access and no build step. The binary lands on your PATH.",
+    code: "curl -fsSL .../install.sh | bash",
   },
   {
-    title: "Activate",
-    body: "Run hivemind auth login. A code appears in your terminal -- approve it here in the browser and you're signed in.",
+    title: "Sign in",
+    body: "A code appears in your terminal. Approve it in the browser and you're linked.",
     code: "hivemind auth login",
   },
   {
-    title: "Top up and go",
-    body: "Add funds from ₹10. No API key to manage -- pay only for the tokens you actually use.",
+    title: "Start working",
+    body: "Add funds from ₹10 and go. No API key of your own to create or rotate.",
     code: "hivemind activate",
-  },
-];
-
-const meterStages = [
-  {
-    label: "Reserve",
-    body: "Before your request goes anywhere, HiveMind holds a conservative upper bound against your balance.",
-  },
-  {
-    label: "Run",
-    body: "The request runs on Flash by default, escalating to Pro only if it looks stuck -- repeated or failing calls.",
-  },
-  {
-    label: "Settle or refund",
-    body: "You're charged the real cost and the rest is returned. Any failure refunds the hold in full, not just the unused part.",
   },
 ];
 
 export default function Home() {
   return (
-    <div className="mx-auto max-w-5xl px-6 py-16 sm:py-24">
-      <section className="grid items-center gap-12 lg:grid-cols-[1.05fr_1fr] lg:gap-10">
-        <div>
-          <p className="font-mono text-xs font-medium tracking-wide text-honey uppercase">
-            Metered by the token, not the seat
-          </p>
-          <h1 className="mt-4 font-display text-4xl leading-[1.05] font-semibold tracking-tight sm:text-5xl">
-            Ship code from the terminal.
-            <br />
-            Pay for the tokens it takes.
-          </h1>
-          <p className="mt-6 max-w-md text-lg text-foreground/75">
-            HiveMind reads and edits files, runs shell commands, and holds a real conversation
-            about your codebase. It starts every task on a cheap model and calls in a stronger one
-            only when it gets stuck -- so you&apos;re not paying Pro rates for Flash-sized work.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-4">
-            <Link
-              href="/activate"
-              className="rounded-md bg-honey px-5 py-2.5 font-medium text-ink transition-colors hover:bg-honey-strong"
-            >
-              Activate your account
-            </Link>
-            <Link
-              href="/pricing"
-              className="rounded-md border border-line-strong px-5 py-2.5 font-medium transition-colors hover:bg-foreground/5"
-            >
-              See pricing
-            </Link>
+    <div className="shell page">
+      <section>
+        <p className="label label-cyan">Metered per token</p>
+        <h1 className="display" style={{ marginTop: "1.25rem" }}>
+          Pay per token.
+          <br />
+          Not per seat.
+        </h1>
+        <p className="lede" style={{ marginTop: "1.5rem" }}>
+          HiveMind reads and edits files, runs shell commands, and reasons about your codebase from
+          the terminal. Every task starts on a cheap model and escalates only when it gets stuck —
+          so you aren&apos;t paying top-tier rates for routine work.
+        </p>
+
+        <InstallPanel />
+
+        <div className="btn-row">
+          <Link href="/activate" className="btn btn-primary">
+            Activate your account
+          </Link>
+          <Link href="/docs" className="btn btn-ghost">
+            Read the docs
+          </Link>
+        </div>
+      </section>
+
+      {/*
+        The signature. One number in three states, not three unrelated stats:
+        what HiveMind holds before a request, what it actually costs, and what
+        comes back. Setting the amount you pay at display size and the other
+        two small is the whole argument, made typographically.
+      */}
+      <section className="ledger">
+        <h2 className="display">One request, start to finish</h2>
+        <div className="ledger-row">
+          <div className="ledger-cell">
+            <span className="label">We hold</span>
+            <span className="ledger-num">$0.000210</span>
+          </div>
+          <div className="ledger-cell ledger-cell--paid">
+            <span className="label">You pay</span>
+            <span className="ledger-num">$0.000038</span>
+          </div>
+          <div className="ledger-cell">
+            <span className="label">You get back</span>
+            <span className="ledger-num">$0.000172</span>
           </div>
         </div>
-
-        <TerminalDemo />
-      </section>
-
-      <section className="mt-24">
-        <h2 className="font-display text-2xl font-semibold tracking-tight">How the meter works</h2>
-        <div className="mt-8 grid gap-px overflow-hidden rounded-lg border border-line bg-line sm:grid-cols-3">
-          {meterStages.map((stage, i) => (
-            <div key={stage.label} className="relative bg-background-raised p-6">
-              <div className="flex items-center gap-2 font-mono text-xs text-foreground/45">
-                <span>{String(i + 1).padStart(2, "0")}</span>
-                {i > 0 && <span aria-hidden>&larr;</span>}
-              </div>
-              <h3 className="mt-3 font-medium">{stage.label}</h3>
-              <p className="mt-2 text-sm text-foreground/65">{stage.body}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="mt-24">
-        <h2 className="font-display text-2xl font-semibold tracking-tight">Get running</h2>
-        <div className="mt-8 grid gap-8 sm:grid-cols-3">
-          {steps.map((step, i) => (
-            // min-w-0: a grid item's automatic minimum width defaults to
-            // its content's min-content size, which for a long unbroken
-            // install URL two levels down (inside a pre's own
-            // overflow-x-auto) still wins over that pre's internal
-            // scrolling unless this item is explicitly allowed to shrink
-            // below it. Confirmed by bisection: without this, the card's
-            // min-content forces the whole page ~460px wider than the
-            // viewport on mobile.
-            <div key={step.title} className="min-w-0 rounded-lg border border-line p-6">
-              <div className="font-mono text-sm text-foreground/40">{`0${i + 1}`}</div>
-              <h3 className="mt-2 font-medium">{step.title}</h3>
-              <p className="mt-2 text-sm text-foreground/65">{step.body}</p>
-              {Array.isArray(step.code) ? (
-                <div className="mt-4 space-y-3">
-                  {step.code.map((variant) => (
-                    <div key={variant.label}>
-                      <div className="font-mono text-[11px] font-medium tracking-wide text-foreground/45 uppercase">
-                        {variant.label}
-                      </div>
-                      <pre className="mt-1 overflow-x-auto rounded bg-foreground/5 p-3 font-mono text-xs">
-                        <code>{variant.code}</code>
-                      </pre>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <pre className="mt-4 overflow-x-auto rounded bg-foreground/5 p-3 font-mono text-xs">
-                  <code>{step.code}</code>
-                </pre>
-              )}
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="mt-24 rounded-lg border border-line p-6">
-        <h2 className="font-medium">Why we ask for your Google account</h2>
-        <p className="mt-2 text-sm text-foreground/65">
-          Signing in with Google gives HiveMind your email address, which we use only to identify
-          your account and track your prepaid balance -- nothing else. We don&apos;t post on your
-          behalf, read your other Google data, or share your email with anyone besides our payment
-          processor (Cashfree) for billing records. Full details in our{" "}
-          <Link href="/privacy" className="underline underline-offset-2">
-            Privacy Policy
-          </Link>
-          .
+        <p className="ledger-note">
+          A conservative estimate is reserved before the request is sent, settled down to the real
+          cost when it completes, and returned in full if anything fails — not just the unused part.
+          The running total prints in your terminal after every turn.
         </p>
+      </section>
+
+      <section className="section">
+        <h2 className="display">Get running</h2>
+        <div className="grid-3">
+          {steps.map((step, i) => (
+            <div key={step.title} className="card">
+              <div className="step-num">{String(i + 1).padStart(2, "0")}</div>
+              <h3 className="card-title" style={{ marginTop: "0.5rem" }}>
+                {step.title}
+              </h3>
+              <p className="card-body">{step.body}</p>
+              <pre className="step-code">
+                <span className="sigil" aria-hidden>
+                  ${" "}
+                </span>
+                <code>{step.code}</code>
+              </pre>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="card">
+          <h2 className="card-title">Why we ask for your Google account</h2>
+          <p className="card-body">
+            Signing in with Google gives HiveMind your email address, which we use only to identify
+            your account and track your prepaid balance — nothing else. We don&apos;t post on your
+            behalf, read your other Google data, or share your email with anyone besides our payment
+            processor (Cashfree) for billing records. Full details in our{" "}
+            <Link href="/privacy" className="link">
+              Privacy Policy
+            </Link>
+            .
+          </p>
+        </div>
       </section>
     </div>
   );

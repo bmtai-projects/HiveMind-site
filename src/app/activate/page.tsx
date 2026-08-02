@@ -4,15 +4,15 @@ import { ActivateClient } from "./ActivateClient";
 
 export default function ActivatePage() {
   return (
-    <div className="mx-auto max-w-lg px-6 py-16">
-      <h1 className="font-display text-3xl font-semibold tracking-tight">Activate</h1>
-      <p className="mt-3 text-sm text-foreground/65">
-        Signed in from the CLI (<code className="font-mono">hivemind auth login</code>)? Enter the
-        code shown in your terminal below. Just here to top up? Sign in and skip straight to
-        adding funds.
+    <div className="shell page" style={{ maxWidth: "34rem" }}>
+      <h1 className="display">Activate</h1>
+      <p className="lede" style={{ marginTop: "1rem", fontSize: "1rem" }}>
+        Signed in from the CLI (
+        <code style={{ fontFamily: "var(--font-data)" }}>hivemind auth login</code>)? Enter the code
+        shown in your terminal. Just here to top up? Sign in and skip straight to adding funds.
       </p>
-      <div className="mt-8">
-        <Suspense fallback={<p className="text-sm text-foreground/55">Loading...</p>}>
+      <div style={{ marginTop: "2.5rem" }}>
+        <Suspense fallback={<p className="notice">Loading…</p>}>
           <ActivateClient />
         </Suspense>
       </div>

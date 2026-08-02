@@ -11,12 +11,12 @@ const links = [
 
 export function Footer() {
   return (
-    <footer className="mt-auto border-t border-line">
-      <div className="mx-auto flex max-w-5xl flex-col gap-4 px-6 py-8 font-mono text-xs text-foreground/60 sm:flex-row sm:items-center sm:justify-between">
+    <footer className="footer">
+      <div className="shell footer-inner">
         <p>&copy; {new Date().getFullYear()} HiveMind. All rights reserved.</p>
-        <nav className="flex flex-wrap gap-x-6 gap-y-2">
+        <nav className="footer-links">
           {links.map((link) => (
-            <Link key={link.href} href={link.href} className="transition-colors hover:text-foreground">
+            <Link key={link.href} href={link.href}>
               {link.label}
             </Link>
           ))}
