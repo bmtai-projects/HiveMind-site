@@ -695,6 +695,13 @@ h3.display {
   This tracks clicks, not scroll position: a genuine scroll-spy needs an
   IntersectionObserver, and a whole JS dependency to move a 1px rail was
   not worth it here.
+
+  MAINTENANCE: one selector line per section `id` in docs/page.tsx's
+  SECTIONS array. A new section that isn't added here still works --
+  clicking it still scrolls and its own heading still highlights via
+  `.docs-section:target` above -- it just won't light up in the sidebar,
+  which is easy to miss in review since nothing errors. Keep this list in
+  sync with SECTIONS whenever a section id is added, renamed, or removed.
 */
 .docs-section:target .docs-h2 {
   color: var(--cyan);
@@ -704,6 +711,7 @@ h3.display {
 .docs:has(#models:target) a[href="#models"],
 .docs:has(#cost:target) a[href="#cost"],
 .docs:has(#tools:target) a[href="#tools"],
+.docs:has(#safety:target) a[href="#safety"],
 .docs:has(#sessions:target) a[href="#sessions"],
 .docs:has(#configuration:target) a[href="#configuration"] {
   color: var(--cyan);
@@ -1048,4 +1056,97 @@ h3.display {
 
 .legal li {
   margin-top: 0.4rem;
+}
+
+/* ---------------------------------------------------------------------------
+   Proof strip
+
+   Sits between the hero and the ledger, and deliberately does NOT repeat the
+   ledger's device. The ledger is one number in three states (reserve, cost,
+   refund) -- an argument made typographically. This is a different claim:
+   what a whole task costs, and what that beats. Reusing the ledger's giant
+   monospace numerals here would make the page read as one long stat wall and
+   flatten the ledger's own moment.
+
+   So: a rule-bounded strip, one large figure on the left, small supporting
+   figures on the right. Quiet enough to sit above the fold without competing
+   with the headline.
+--------------------------------------------------------------------------- */
+.proof {
+  margin-top: 3rem;
+  display: grid;
+  gap: 1.75rem;
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--edge);
+  border-bottom: 1px solid var(--edge);
+}
+
+@media (min-width: 52rem) {
+  .proof {
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 3rem;
+  }
+}
+
+.proof-lead {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.proof-num {
+  font-family: var(--font-data);
+  font-size: clamp(2.25rem, 6vw, 3rem);
+  font-weight: 600;
+  line-height: 1;
+  color: var(--cyan);
+  /* Tabular figures so the number does not reflow if it is edited to a
+     different width -- this is a value the owner is expected to change. */
+  font-variant-numeric: tabular-nums;
+}
+
+.proof-lead-label {
+  font-size: 0.9rem;
+  color: var(--muted);
+  max-width: 22ch;
+}
+
+.proof-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+}
+
+/* The divider only appears once the items actually sit side by side; at one
+   column a left rule would read as an indent, not a separator. */
+@media (min-width: 52rem) {
+  .proof-items {
+    border-left: 1px solid var(--edge);
+    padding-left: 3rem;
+  }
+}
+
+.proof-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.proof-item-value {
+  font-family: var(--font-data);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.proof-item-label {
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--faint);
 }

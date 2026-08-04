@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { InstallPanel } from "@/components/InstallPanel";
+import { ProofBanner } from "@/components/ProofBanner";
 
 // install -> activate -> top up is a genuine ordered sequence (you cannot do
 // the third before the first), which is the only reason these carry numbers.
@@ -38,6 +39,8 @@ export default function Home() {
           the terminal. Every task starts on a cheap model and escalates only when it gets stuck —
           so you aren&apos;t paying top-tier rates for routine work.
         </p>
+
+        <ProofBanner />
 
         <InstallPanel />
 
