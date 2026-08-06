@@ -17,10 +17,10 @@
  * Change the numbers here, not in the markup below.
  */
 const PROOF = {
-  headline: "$0.005",
-  headlineLabel: "a real coding task, start to finish",
+  headline: "$2k+",
+  headlineLabel: "Turned Ideas into $2K+",
   items: [
-    { value: "14×", label: "cheaper than Sonnet on the same work" },
+    { value: "10×", label: "cheaper than Sonnet on the same work" },
     { value: "₹10", label: "minimum top-up — no subscription" },
     { value: "7", label: "models, one balance" },
   ],
