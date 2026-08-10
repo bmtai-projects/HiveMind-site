@@ -20,12 +20,14 @@ type Section = {
 };
 
 // Every entry here is a real, implemented feature -- nothing aspirational.
-// Most are in the current public release binary. A handful are merged to
-// the `week1-harness-quality` branch (built, tested, not yet tagged/
-// released) -- flagged in a comment on the entry itself, not in the UI, so
-// this file stays an honest record even though the page doesn't editorialize
+// Most are in the current public release binary. A handful are merged but
+// not yet in a tagged release -- either sitting on a feature branch (e.g.
+// `week1-harness-quality`) or already on `main` ahead of the last release
+// tag -- flagged in a comment on the entry itself, not in the UI, so this
+// file stays an honest record even though the page doesn't editorialize
 // about release status. Cross-check against HiveMind's own commit history
-// before adding to this list, not against memory of an earlier pass.
+// and `git log --decorate` against the latest tag before adding to this
+// list, not against memory of an earlier pass.
 const SECTIONS: Section[] = [
   {
     id: "getting-started",
@@ -83,6 +85,14 @@ const SECTIONS: Section[] = [
         example: {
           kind: "output",
           text: "escalating hivemind → claude-sonnet-5: repeated or failing tool calls on this task",
+        },
+      },
+      {
+        title: "Escalation is driven by what actually happened, not text that merely looks like it failed", // merged to main, not yet in a tagged release
+        body: "Every tool reports its own outcome directly — succeeded, failed, denied, or timed out — instead of HiveMind guessing from the words in the result. That used to be a real gap: reading a log file whose first line is an error, or a source file that formats its own error messages, looked identical to an actually failed command, and could count toward the same escalation as a genuine repeated failure. Now only a call that genuinely failed ever counts.",
+        example: {
+          kind: "output",
+          text: "log.txt's first line is \"ERROR: connection refused\" — read_file still succeeded, so it's never counted toward escalation",
         },
       },
       {
@@ -164,6 +174,14 @@ const SECTIONS: Section[] = [
         body: "create_diagram takes Mermaid syntax — flowchart, sequence, class, ER, state, gantt, and more — and renders it as an image. The raw diagram source is always written first, so nothing is wasted even with zero extra tooling installed; if mmdc (mermaid-cli) is on your machine, it also renders a real .svg or .png alongside it. A missing renderer or a broken diagram never fails the task outright — HiveMind explains exactly what happened and how to view the source anyway (mermaid.live, or any Mermaid-aware editor).",
         example: { kind: "output", text: "wrote docs/flow.mmd (source) and rendered docs/flow.svg" },
       },
+      {
+        title: "Search the web, with citations", // merged to main, not yet in a tagged release
+        body: "Opt-in, hosted-only, and off by default. hivemind auth login unlocks web_search and web_fetch for that session; turn them on with --web at launch or /web on mid-session, and HiveMind is capped at 3 search/fetch operations per request — enough to answer a real question, not enough to spiral into an unbounded crawl. Every claim comes back as a numbered source with its title, URL, and publish date, rendered as clean citation cards rather than raw scraped text — in both the terminal and the VS Code extension — and web content is treated as untrusted data the model reads, never as instructions it follows.",
+        example: {
+          kind: "output",
+          text: "1. [Eiffel Tower information: facts, height in feet, weight](https://www.toureiffel.paris/en/the-monument/key-figures) (published 2026-02-23)",
+        },
+      },
     ],
   },
   {
@@ -220,6 +238,14 @@ const SECTIONS: Section[] = [
         title: "Resume where you left off",
         body: "Every session is saved as you go, including the cost spent so far — closing the terminal, a crash, or reloading the editor doesn't throw away a conversation you already spent real tokens building up.",
         example: { kind: "command", text: "hivemind activate --continue" },
+      },
+      {
+        title: "Large results are archived, not dropped", // merged to main, not yet in a tagged release
+        body: "A tool result at or above 10,000 bytes (configurable — artifact_threshold_bytes in config.toml, 0 disables it) is written to disk in full the moment it comes back, and replaced in the conversation by a preview: the first and last 80 lines, plus every distinct error or failure line found anywhere in between — not just the ends, since a 40,000-line test run usually buries its failures in the middle. Nothing is lost — read_artifact(handle, offset, limit) fetches any range of the original later, even after the preview itself has been compacted out of the conversation. Measured on a real 2.3 MB test-log task: session cost dropped from $0.0144 to $0.0031, and the model found the buried failures more reliably, not less — trimming to fit a budget and losing the answer turned out not to be the same trade.",
+        example: {
+          kind: "output",
+          text: "[artifact] artifact://sess/call1/output — 40000 line(s), 2.2 MB. This is a preview; read any range with read_artifact(handle, offset, limit).",
+        },
       },
       {
         title: "Old output is dropped before anything is summarized",
