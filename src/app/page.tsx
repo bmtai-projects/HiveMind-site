@@ -1,7 +1,9 @@
 import Link from "next/link";
 
 import { InstallPanel } from "@/components/InstallPanel";
+import { Mechanics } from "@/components/Mechanics";
 import { ProofBanner } from "@/components/ProofBanner";
+import { TurnLoop } from "@/components/TurnLoop";
 
 // install -> activate -> top up is a genuine ordered sequence (you cannot do
 // the third before the first), which is the only reason these carry numbers.
@@ -54,6 +56,18 @@ export default function Home() {
         </div>
       </section>
 
+      {/* The diagram earns its place before the ledger: it shows the shape of
+          a turn, so the three figures below it read as a settlement rather
+          than as trivia. */}
+      <section className="section">
+        <h2 className="display">How a turn actually runs</h2>
+        <p className="lede" style={{ marginTop: "0.75rem" }}>
+          Not a pipeline you configure — a loop that closes on itself, and prices itself every time
+          it does.
+        </p>
+        <TurnLoop />
+      </section>
+
       {/*
         The signature. One number in three states, not three unrelated stats:
         what HiveMind holds before a request, what it actually costs, and what
@@ -81,6 +95,16 @@ export default function Home() {
           cost when it completes, and returned in full if anything fails — not just the unused part.
           The running total prints in your terminal after every turn.
         </p>
+      </section>
+
+      <section className="section">
+        <h2 className="display">Where the cost goes</h2>
+        <p className="lede" style={{ marginTop: "0.75rem" }}>
+          Three mechanics do most of the work. None of them is a model choice.
+        </p>
+        <div style={{ marginTop: "2rem" }}>
+          <Mechanics />
+        </div>
       </section>
 
       <section className="section">

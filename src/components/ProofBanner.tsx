@@ -22,7 +22,7 @@ const PROOF = {
   items: [
     { value: "10×", label: "cheaper than Sonnet on the same work" },
     { value: "₹10", label: "minimum top-up — no subscription" },
-    { value: "7", label: "models, one balance" },
+    { value: "8", label: "models, one balance" },
   ],
 } as const;
 
