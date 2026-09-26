@@ -10,7 +10,7 @@ const steps = [
   {
     title: "Install",
     body: "One command, no source access and no build step. The binary lands on your PATH.",
-    code: "curl -fsSL .../install.sh | bash",
+    code: "curl -fsSL hivemind.bmtai.in/install.sh | bash",
   },
   {
     title: "Sign in",

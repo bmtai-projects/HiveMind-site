@@ -13,15 +13,13 @@ const TARGETS: Target[] = [
   {
     id: "unix",
     label: "macOS / Linux",
-    command:
-      "curl -fsSL https://raw.githubusercontent.com/BibhabenduMukherjee/HiveMind-releases/main/install.sh | bash",
+    command: "curl -fsSL https://hivemind.bmtai.in/install.sh | bash",
     note: "Installs to ~/.local/bin. Works on Intel and Apple silicon.",
   },
   {
     id: "windows",
     label: "Windows",
-    command:
-      "irm https://raw.githubusercontent.com/BibhabenduMukherjee/HiveMind-releases/main/install.ps1 | iex",
+    command: "irm https://hivemind.bmtai.in/install.ps1 | iex",
     note: "Run in PowerShell, not Command Prompt.",
   },
 ];
