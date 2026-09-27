@@ -1,15 +1,16 @@
 import type { NextConfig } from "next";
 
-const RELEASES_RAW =
-  "https://raw.githubusercontent.com/BibhabenduMukherjee/HiveMind-releases/main";
+// The install scripts now live in the main repo, next to the code they
+// install, so they get reviewed in pull requests.
+const INSTALLERS_RAW = "https://raw.githubusercontent.com/bmtai-projects/HiveMind/main";
 
 const nextConfig: NextConfig = {
-  // Serve the installers from this domain, proxied from HiveMind-releases so
-  // the scripts stay single-source and need no redeploy when they change.
+  // Proxied rather than copied in, so the scripts stay single-source: editing
+  // them in the repo takes effect here with no redeploy.
   async rewrites() {
     return [
-      { source: "/install.sh", destination: `${RELEASES_RAW}/install.sh` },
-      { source: "/install.ps1", destination: `${RELEASES_RAW}/install.ps1` },
+      { source: "/install.sh", destination: `${INSTALLERS_RAW}/install.sh` },
+      { source: "/install.ps1", destination: `${INSTALLERS_RAW}/install.ps1` },
     ];
   },
 };
